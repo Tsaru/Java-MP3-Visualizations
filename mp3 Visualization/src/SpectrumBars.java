@@ -12,6 +12,7 @@ public class SpectrumBars extends Visualization {
 	private final int HORIZONTAL_PADDING = 8;
 	private Color[] colorShiftVals;
 	private boolean isStartColorShifting;
+	private final int COLOR_SHIFT_SPEED = 3;
 	
 	SpectrumBars(int freqMax) {
 		isStartColorShifting = false;
@@ -75,7 +76,7 @@ public class SpectrumBars extends Visualization {
 		if(maxDifference < Math.abs(bDifference))
 			maxDifference = Math.abs(bDifference);
 		
-		int numSteps = (int)(((maxDifference*255.0)/5.0)+.5);
+		int numSteps = (int)(((maxDifference*255.0)/COLOR_SHIFT_SPEED)+.5);
 		colorShiftVals = new Color[numSteps];
 		
 		for(int i = 0; i < numSteps; ++i) {
@@ -118,7 +119,6 @@ public class SpectrumBars extends Visualization {
 		float sum = 0;
 		int bar_count = 0;
 		int[] heights = new int[numBars];
-		System.out.println(magnitudes.length);
 		double max = ((((double) magnitudes.length/(double) numBars)*maxFrequency)-600);
 		int maxHeight = barHeight;
 		for(int i = 0; i < magnitudes.length; ++i) {

@@ -4,6 +4,8 @@ import java.net.URL;
 import javax.swing.JOptionPane;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -27,7 +29,7 @@ public class VisualizationInterface extends Application {
 	  final int max = 100;
 	
 	  private final Label songChooserLabel = new Label("Song Location:");
-	  private final TextField songChooserTextField = new TextField("Train - Drops of Jupiter.mp3");
+	  private final TextField songChooserTextField = new TextField(getClass().getResource("Train - Drops of Jupiter.mp3").toString().substring(6));
 	  private final Button songOpenButton = new Button("Open");
 	  private final Button songBrowseButton = new Button("Browse");
 	  private final FileChooser songFileChooser = new FileChooser();
@@ -39,15 +41,44 @@ public class VisualizationInterface extends Application {
 			        "Visualization 2",
 			        "Visualization 3"
 			    );
-	  private final ComboBox visualizationChooserComboBox = new ComboBox(visualizationList);
+	  private final ComboBox<String> visualizationChooserComboBox = new ComboBox<String>(visualizationList);
 	  
 	  private Visualization visualization;
 	  private SpectrumListener spectrumListener;
 	  private MediaPlayer mediaPlayer;
 	  private VBox root = new VBox(10);
 	  
+	  private void StartNewSong() {
+	      try{
+	    	  //System.out.println("file:/"+songChooserTextField.getText());
+	    	  mediaPlayer.stop();
+	    	  mediaPlayer = new MediaPlayer(new Media("file:/"+songChooserTextField.getText().toString()));
+	    	  UpdateVisualization();
+        	  mediaPlayer.play();
+	      } catch (Exception exc) {
+	    	  exc.printStackTrace();
+	    	  JOptionPane.showMessageDialog(null,
+	        			"Error loading song!", "Mp3 Visualizer",
+	        			JOptionPane.WARNING_MESSAGE);
+	      }
+	  }
+	  
+	  private void UpdateVisualization() {
+		  if(visualizationChooserComboBox.getValue() != null) {
+			  if(visualization != null)
+	        	  root.getChildren().remove(1);
+			  if(visualizationChooserComboBox.getValue() == "Spectrum Bars") {
+				  visualization = new SpectrumBars(max);
+				  spectrumListener = new SpectrumListener(visualization);
+				  mediaPlayer.setAudioSpectrumThreshold((-1)*max);
+		    	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
+			  }
+	    	  root.getChildren().add(visualization);
+		  }
+	  }
+	  
 	  public static void main(String[] args) {
-	    launch(args);
+		  launch(args);
 	  }
 
 	  @Override
@@ -73,90 +104,40 @@ public class VisualizationInterface extends Application {
 				 
 			  @Override
 			  public void handle(ActionEvent e) {
-				  URL songLocation = getClass().getResource(songChooserTextField.getText());
-				  
-			      try{
-			    	  //Most of this code should be put into it's own function.
-			    	  Media song = new Media(songLocation.toString());
-					  System.out.println(songLocation.toString());
-			    	  mediaPlayer.stop();
-			    	  mediaPlayer = new MediaPlayer(song);
-			    	  visualization = new SpectrumBars(max);
-			    	  spectrumListener = new SpectrumListener(visualization);
-					  mediaPlayer.setAudioSpectrumThreshold((-1)*max);
-			    	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
-		        	  mediaPlayer.play();
-			    	  root.getChildren().remove(1);
-			    	  root.getChildren().add(visualization);
-			      } catch (Exception exc) {
-			    	  exc.printStackTrace();
-			    	  JOptionPane.showMessageDialog(null,
-			        			"Error loading song!", "Mp3 Visualizer",
-			        			JOptionPane.WARNING_MESSAGE);
-			      }
+				  StartNewSong();
 			  	}
-			});
+		  });
 			
-		  	
-		  	//This is not working. Most of the code is functional in songOpenButton's event handler.
-			songBrowseButton.setOnAction(new EventHandler<ActionEvent>() {
+		  songBrowseButton.setOnAction(new EventHandler<ActionEvent>() {
 				
-				@Override
-				public void handle(ActionEvent e) {
-					File file = songFileChooser.showOpenDialog(songBrowseButton.getScene().getWindow());
-					if(file != null) {
-						try {
-							System.out.println(file.toURI().toURL().toString());
-							Media song = new Media(file.toURI().toURL().toString());
-							if(song.getError() == null) {
-								try{
-					        		mediaPlayer.pause();
-					        		mediaPlayer = new MediaPlayer(song);
-					        		mediaPlayer.play();
-					        		songChooserTextField.setText(file.getPath());
-					        	} catch (Exception exc) {
-					        		mediaPlayer.play();
-					        		exc.printStackTrace();
-					        		JOptionPane.showMessageDialog(null,
-					        				"Error initializing your image!", "Image loader",
-					        				JOptionPane.WARNING_MESSAGE);
-					        	}
-					    	  
-							} else {
-					    	  JOptionPane.showMessageDialog(null,
-					    			  "Error loading song!", "mp3 Visualization",
-					    			  JOptionPane.WARNING_MESSAGE);
-					        }
-						} catch (Exception exc) {
-			        		exc.printStackTrace();
-			        		JOptionPane.showMessageDialog(null,
+			  @Override
+			  public void handle(ActionEvent e) {
+				  File file = songFileChooser.showOpenDialog(songBrowseButton.getScene().getWindow());
+				  if(file != null) {
+					  try {
+						  songChooserTextField.setText(file.toURI().toURL().toString().substring(6));
+					  }	catch (Exception exc) {
+						  exc.printStackTrace();
+						  JOptionPane.showMessageDialog(null,
 			        				"Error initializing your image!", "Image loader",
 			        				JOptionPane.WARNING_MESSAGE);
-						}
-					}
-				}
-			});
-			
-			//TODO: add a handler for a change of the selected visualization.
+					  }
+					  StartNewSong();
+				  }
+			  }
+		  });
 		  
-		  visualization = new SpectrumBars(max);
-		  
-		  final URL resource = getClass().getResource("Train - Drops of Jupiter.mp3");
-		  //final URL resource = getClass().getResource("file:C:/Angel - Wonderful.mp3");
-		  System.out.println(getClass().getResource("Train - Drops of Jupiter.mp3"));
-		  System.out.println(resource.toString());
-		  final Media media = new Media(resource.toString());
-		  mediaPlayer = new MediaPlayer(media);
-		  
-		  spectrumListener = new SpectrumListener(visualization);
-		  mediaPlayer.setAudioSpectrumThreshold((-1)*max);
-		  mediaPlayer.setAudioSpectrumListener(spectrumListener);
-		  
-		  root.getChildren().add(interfaceElements);
-		  root.getChildren().add(visualization);
-	    
-		  mediaPlayer.play();
+		  visualizationChooserComboBox.valueProperty().addListener(new ChangeListener<String>() {
+	            public void changed(ObservableValue<? extends String> ov,
+	                String old_val, String new_val) {
+	                	UpdateVisualization();
+	            }
+	        });
 
+		  root.getChildren().add(interfaceElements);
+    	  mediaPlayer = new MediaPlayer(new Media("file:/"+songChooserTextField.getText().toString()));
+		  visualizationChooserComboBox.getSelectionModel().selectFirst();
+    	  mediaPlayer.play();
 		  primaryStage.setScene(scene);
 		  primaryStage.sizeToScene();
 		  primaryStage.show();

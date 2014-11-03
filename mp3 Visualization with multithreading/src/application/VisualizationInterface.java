@@ -1,5 +1,6 @@
+package application;
+
 import java.io.File;
-import java.net.URL;
 
 import javax.swing.JOptionPane;
 
@@ -23,6 +24,8 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+// So far, this is an exact duplicate of the previous VisualizationInterface.java,
+// but we will hopefully implement multithreading in this version.
 
 public class VisualizationInterface extends Application {
 	

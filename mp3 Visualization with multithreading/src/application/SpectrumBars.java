@@ -2,8 +2,12 @@ package application;
 
 import java.util.Random;
 
+import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 
 public class SpectrumBars extends Visualization {
@@ -15,8 +19,9 @@ public class SpectrumBars extends Visualization {
 	private Color[] colorShiftVals;
 	private boolean isStartColorShifting;
 	private final int COLOR_SHIFT_SPEED = 3;
+	Canvas display;
 	
-	SpectrumBars(int freqMax) {
+	SpectrumBars(int freqMax, Pane pane) {
 		isStartColorShifting = false;
 		maxFrequency = freqMax;
 		numBars = 8;
@@ -25,12 +30,13 @@ public class SpectrumBars extends Visualization {
 		rectangleHeight = 15;
 		horizontalGap = 7;
 		verticalGap = 3;
-		setWidth(rectangleWidth*numBars+horizontalGap*(numBars+1)+HORIZONTAL_PADDING);
-		setHeight(rectangleHeight*barHeight+verticalGap*(barHeight+1)+VERTICAL_PADDING);
+		display = new Canvas(rectangleWidth*numBars+horizontalGap*(numBars+1)+HORIZONTAL_PADDING,
+							 rectangleHeight*barHeight+verticalGap*(barHeight+1)+VERTICAL_PADDING);
 		startColor = Color.GOLD;
 		endColor = Color.BLUE;
 		backgroundColor = Color.BLACK;
 		updateColorShiftVals();
+		pane.getChildren().add(display);
 	}
 	
 
@@ -140,25 +146,39 @@ public class SpectrumBars extends Visualization {
 	}
 	
 	public void Update(double timestamp, double duration, float[] magnitudes, float[] phases) {
-		GraphicsContext context = getGraphicsContext2D();
-		setWidth(rectangleWidth*numBars+horizontalGap*(numBars+1)+HORIZONTAL_PADDING);
-		setHeight(rectangleHeight*barHeight+verticalGap*(barHeight+1)+VERTICAL_PADDING);
+		GraphicsContext context = display.getGraphicsContext2D();
+		display.setWidth(rectangleWidth*numBars+horizontalGap*(numBars+1)+HORIZONTAL_PADDING);
+		display.setHeight(rectangleHeight*barHeight+verticalGap*(barHeight+1)+VERTICAL_PADDING);
 		incrementColors();
 		Color[] colorVals = getColorVals();
 		int[] heights = processHeights(magnitudes);
 		context.setFill(backgroundColor);
-		context.fillRect(0, 0, getWidth(), getHeight());
+		context.fillRect(0, 0, display.getWidth(), display.getHeight());
 		for(int bar_index = 0; bar_index < numBars; ++bar_index) {
 			if(heights[bar_index] >= barHeight)
 				heights[bar_index] = barHeight-1;
 			int x_val = rectangleWidth*bar_index+horizontalGap*(bar_index+1)+HORIZONTAL_PADDING/2;
 			for(int rectangle_index = 1; rectangle_index <= heights[bar_index]; ++rectangle_index) {
-				int y_val = (int) getHeight() - (rectangleHeight*rectangle_index+verticalGap*(rectangle_index+1)+VERTICAL_PADDING/2);
+				int y_val = (int) display.getHeight() - (rectangleHeight*rectangle_index+verticalGap*(rectangle_index+1)+VERTICAL_PADDING/2);
 				context.setFill(colorVals[rectangle_index]);
 				context.fillRect(x_val, y_val, rectangleWidth, rectangleHeight);
 			}
 		}
 		
+	}
+
+
+
+	@Override
+	public void run() {
+		System.out.println("This class does not need multithreading.");
+	}
+
+
+
+	@Override
+	public Node getNode() {
+		return display;
 	}
 	
 }

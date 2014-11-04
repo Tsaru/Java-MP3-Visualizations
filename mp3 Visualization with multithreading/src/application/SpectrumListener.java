@@ -4,24 +4,24 @@ import javafx.scene.media.AudioSpectrumListener;
 
 public class SpectrumListener implements AudioSpectrumListener {
 
-	Visualization myDisplay;
+	Visualization visualization;
 	
-	SpectrumListener(Visualization display) {
-		myDisplay = display;
+	SpectrumListener(Visualization visualization) {
+		this.visualization = visualization;
 	}
 	
-	public Visualization getDisplay() {
-		return myDisplay;
+	public Visualization getVisualization() {
+		return visualization;
 	}
 	
-	public void setDisplay(Visualization display) {
-		myDisplay = display;
+	public void setvisualization(Visualization visualization) {
+		this.visualization = visualization;
 	}
 	
 	@Override
 	public void spectrumDataUpdate( double timestamp, double duration,
 									float[] magnitudes, float[] phases) {
-		myDisplay.Update(timestamp, duration, magnitudes, phases);
+		visualization.Update(timestamp, duration, magnitudes, phases);
 	}
 
 }

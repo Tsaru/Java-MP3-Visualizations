@@ -30,6 +30,7 @@ import javafx.stage.Stage;
 public class VisualizationInterface extends Application {
 	
 	  final int maximumVolume = 100;
+	  private Thread t;
 	
 	  private final Label songChooserLabel = new Label("Song Location:");
 	  private final TextField songChooserTextField = new TextField(getClass().getResource("Train - Drops of Jupiter.mp3").toString().substring(6));
@@ -40,8 +41,8 @@ public class VisualizationInterface extends Application {
 	  private final Label visualizationChooserLabel = new Label("Visualization:");
 	  private final ObservableList<String> visualizationList = 
 			    FXCollections.observableArrayList(
+				    "Animated Circle",
 			        "Spectrum Bars",
-			        "Visualization 2",
 			        "Visualization 3"
 			    );
 	  private final ComboBox<String> visualizationChooserComboBox = new ComboBox<String>(visualizationList);
@@ -71,12 +72,17 @@ public class VisualizationInterface extends Application {
 			  if(visualization != null)
 	        	  root.getChildren().remove(1);
 			  if(visualizationChooserComboBox.getValue() == "Spectrum Bars") {
-				  visualization = new SpectrumBars(maximumVolume);
-				  spectrumListener = new SpectrumListener(visualization);
-				  mediaPlayer.setAudioSpectrumThreshold((-1)*maximumVolume);
-		    	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
+				  visualization = new SpectrumBars(maximumVolume, root);
 			  }
-	    	  root.getChildren().add(visualization);
+			  if(visualizationChooserComboBox.getValue() == "Animated Circle") {
+				  visualization = new AnimatedCircle(maximumVolume, root);
+			  }
+			  //t = new Thread(visualization, "visualization");
+			  //t.start();
+			  spectrumListener = new SpectrumListener(visualization);
+			  mediaPlayer.setAudioSpectrumThreshold((-1)*maximumVolume);
+	    	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
+	    	  //root.getChildren().add(visualization.getNode());
 		  }
 	  }
 	  

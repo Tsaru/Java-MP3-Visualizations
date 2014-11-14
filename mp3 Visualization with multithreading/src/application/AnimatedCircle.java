@@ -89,4 +89,10 @@ public class AnimatedCircle extends Visualization {
 	public Node getNode() {
 		return canvas;
 	}
+
+	@Override
+	protected Object call() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

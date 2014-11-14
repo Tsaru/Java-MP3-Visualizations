@@ -1,5 +1,7 @@
 import java.util.Random;
 
+import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -13,25 +15,39 @@ public class SpectrumBars extends Visualization {
 	private Color[] colorShiftVals;
 	private boolean isStartColorShifting;
 	private final int COLOR_SHIFT_SPEED = 3;
+	private float[] minMagnitudes, maxMagnitudes;
+	Canvas display;
+
+	SpectrumBars() {
+		this(100);
+	}
 	
-	SpectrumBars(int freqMax) {
+	SpectrumBars(int volMax) {
+		this(volMax, 8, 12, 40, 15, 7, 3);
+	}
+	
+	SpectrumBars(int volMax, int bars) {
+		this(volMax, bars, 12, 40, 15, 7, 3);
+	}
+	
+	SpectrumBars(int volMax, int bars, int height, int rectWidth, int rectHeight, int hGap, int vGap) {
+		display = new Canvas();
 		isStartColorShifting = false;
-		maxFrequency = freqMax;
-		numBars = 8;
-		barHeight = 12;
-		rectangleWidth = 40;
-		rectangleHeight = 15;
-		horizontalGap = 7;
-		verticalGap = 3;
-		setWidth(rectangleWidth*numBars+horizontalGap*(numBars+1)+HORIZONTAL_PADDING);
-		setHeight(rectangleHeight*barHeight+verticalGap*(barHeight+1)+VERTICAL_PADDING);
+		maxVolume = volMax;
+		numBars = bars;
+		barHeight = height;
+		rectangleWidth = rectWidth;
+		rectangleHeight = rectHeight;
+		horizontalGap = hGap;
+		verticalGap = vGap;
+		display.setWidth(rectangleWidth*numBars+horizontalGap*(numBars+1)+HORIZONTAL_PADDING);
+		display.setHeight(rectangleHeight*barHeight+verticalGap*(barHeight+1)+VERTICAL_PADDING);
 		startColor = Color.GOLD;
 		endColor = Color.BLUE;
 		backgroundColor = Color.BLACK;
 		updateColorShiftVals();
+		
 	}
-	
-
 	
 	private Color randomColor() {
 		int startDifference = 0, endDifference = 0;
@@ -116,47 +132,95 @@ public class SpectrumBars extends Visualization {
 	
 	private int[] processHeights(float[] magnitudes) {
 
-		float sum = 0;
+		double sum = 0;
 		int bar_count = 0;
 		int[] heights = new int[numBars];
-		double max = ((((double) magnitudes.length/(double) numBars)*maxFrequency)-600);
+		double maxRange = ((((double) magnitudes.length/(double) numBars)*maxVolume));
+		double max = 0;
+		double min = 0;
 		int maxHeight = barHeight;
 		for(int i = 0; i < magnitudes.length; ++i) {
 			if(i+1 >= (bar_count+1)*(magnitudes.length/numBars)) {
-				double val = (double) (numBars-bar_count-1)/numBars*.8;
-				sum = -1*sum-600;
-				sum += (int)(max-sum)*val;
-				heights[bar_count] = (int) ( (double) Math.pow(sum/(max), 6)*maxHeight);
+				//double val = (double) (numBars-bar_count-1)/numBars*.8;
+				max = max*1.25;
+				if(max > maxRange)
+					max = maxRange;
+				min = min*0.75;
+				//System.out.format("bar: %d, max: %f, min: %f, sum: %f%n", bar_count, max, min, sum);
+				sum = (sum - min);
+				//sum += (int)(max-sum)*val;
+				heights[bar_count] = (int) ( (double) Math.pow(sum/(maxRange-min), 6)*maxHeight);
 				bar_count+=1;
-				sum = magnitudes[i];
+				sum = (double) -1*magnitudes[i];
+				max = 0;
+				min = 0;
 			}
-			else sum += magnitudes[i];
+			else  {
+				sum += (double) -1*magnitudes[i];
+				max += maxMagnitudes[i];
+				min += minMagnitudes[i];
+			}
 		}
 		if(bar_count != numBars)
-			heights[bar_count] = -1*((int) ( (sum/(max-(numBars-bar_count)*20+300))*((double) barHeight)));
+			heights[bar_count] = -1*((int) ( (sum/(maxRange-(numBars-bar_count)*20+300))*((double) barHeight)));
 		return heights;
 	}
 	
+	private void initializeMinMax(float[] magnitudes) {
+		//System.out.println("INITIALIZING");
+		minMagnitudes = new float[magnitudes.length];
+		maxMagnitudes = new float[magnitudes.length];
+		for(int i = 0; i < magnitudes.length; ++i) {
+			minMagnitudes[i] = -1*magnitudes[i];
+			maxMagnitudes[i] = -1*magnitudes[i];
+		}
+	}
+	
+	private void updateMinMax(float[] magnitudes) {
+		if(minMagnitudes == null || maxMagnitudes == null)
+			initializeMinMax(magnitudes);
+		else if(minMagnitudes.length != magnitudes.length || maxMagnitudes.length != magnitudes.length)
+			initializeMinMax(magnitudes);
+		else
+			for(int i = 0; i < magnitudes.length; ++i) {
+				if(-1*magnitudes[i] < minMagnitudes[i]) {
+					minMagnitudes[i] = -1*magnitudes[i];
+					//System.out.println("New min");
+				}
+				if(-1*magnitudes[i] > maxMagnitudes[i]) {
+					//System.out.format("magnitude: %f, max: %f, result: ", magnitudes[i], maxMagnitudes[i]);
+					//System.out.println(magnitudes[i] > maxMagnitudes[i]);
+					maxMagnitudes[i] = -1*magnitudes[i];
+				}
+			}
+	}
+	
 	public void Update(double timestamp, double duration, float[] magnitudes, float[] phases) {
-		GraphicsContext context = getGraphicsContext2D();
-		setWidth(rectangleWidth*numBars+horizontalGap*(numBars+1)+HORIZONTAL_PADDING);
-		setHeight(rectangleHeight*barHeight+verticalGap*(barHeight+1)+VERTICAL_PADDING);
+		updateMinMax(magnitudes);
+		GraphicsContext context = display.getGraphicsContext2D();
+		display.setWidth(rectangleWidth*numBars+horizontalGap*(numBars+1)+HORIZONTAL_PADDING);
+		display.setHeight(rectangleHeight*barHeight+verticalGap*(barHeight+1)+VERTICAL_PADDING);
 		incrementColors();
 		Color[] colorVals = getColorVals();
 		int[] heights = processHeights(magnitudes);
 		context.setFill(backgroundColor);
-		context.fillRect(0, 0, getWidth(), getHeight());
+		context.fillRect(0, 0, display.getWidth(), display.getHeight());
 		for(int bar_index = 0; bar_index < numBars; ++bar_index) {
 			if(heights[bar_index] >= barHeight)
 				heights[bar_index] = barHeight-1;
 			int x_val = rectangleWidth*bar_index+horizontalGap*(bar_index+1)+HORIZONTAL_PADDING/2;
 			for(int rectangle_index = 1; rectangle_index <= heights[bar_index]; ++rectangle_index) {
-				int y_val = (int) getHeight() - (rectangleHeight*rectangle_index+verticalGap*(rectangle_index+1)+VERTICAL_PADDING/2);
+				int y_val = (int) display.getHeight() - (rectangleHeight*rectangle_index+verticalGap*(rectangle_index+1)+VERTICAL_PADDING/2);
 				context.setFill(colorVals[rectangle_index]);
 				context.fillRect(x_val, y_val, rectangleWidth, rectangleHeight);
 			}
 		}
 		
+	}
+
+	@Override
+	public Node getNode() {
+		return display;
 	}
 	
 }

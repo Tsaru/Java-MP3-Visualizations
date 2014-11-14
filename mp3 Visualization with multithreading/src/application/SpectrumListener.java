@@ -14,7 +14,7 @@ public class SpectrumListener implements AudioSpectrumListener {
 		return visualization;
 	}
 	
-	public void setvisualization(Visualization visualization) {
+	public void setVisualization(Visualization visualization) {
 		this.visualization = visualization;
 	}
 	

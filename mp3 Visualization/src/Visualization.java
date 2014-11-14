@@ -1,9 +1,13 @@
 
-import javafx.scene.canvas.Canvas;
+import javafx.scene.Node;
 
-public abstract class Visualization extends Canvas {
+public abstract class Visualization {
 	
-	int maxFrequency;
+	int maxVolume;
 	
 	public abstract void Update(double timestamp, double duration, float[] magnitudes, float[] phases);
+	
+	public abstract Node getNode();
+	
+	public int getMaxVolume() { return maxVolume; }
 }

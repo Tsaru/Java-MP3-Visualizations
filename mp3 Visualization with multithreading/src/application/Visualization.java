@@ -1,8 +1,9 @@
 package application;
 
+import javafx.concurrent.Task;
 import javafx.scene.Node;
 
-public abstract class Visualization implements Runnable {
+public abstract class Visualization extends Task {
 	
 	
 	protected int maxFrequency;

@@ -1,5 +1,4 @@
 import java.io.File;
-import java.net.URL;
 
 import javax.swing.JOptionPane;
 
@@ -28,6 +27,7 @@ public class VisualizationInterface extends Application {
 	
 	  final int maximumVolume = 100;
 	
+	  private Stage stage;
 	  private final Label songChooserLabel = new Label("Song Location:");
 	  private final TextField songChooserTextField = new TextField(getClass().getResource("Train - Drops of Jupiter.mp3").toString().substring(6));
 	  private final Button songOpenButton = new Button("Open");
@@ -38,7 +38,7 @@ public class VisualizationInterface extends Application {
 	  private final ObservableList<String> visualizationList = 
 			    FXCollections.observableArrayList(
 			        "Spectrum Bars",
-			        "Visualization 2",
+			        "Spectrum Bars Wide",
 			        "Visualization 3"
 			    );
 	  private final ComboBox<String> visualizationChooserComboBox = new ComboBox<String>(visualizationList);
@@ -53,6 +53,7 @@ public class VisualizationInterface extends Application {
 	    	  //System.out.println("file:/"+songChooserTextField.getText());
 	    	  mediaPlayer.stop();
 	    	  mediaPlayer = new MediaPlayer(new Media("file:/"+songChooserTextField.getText().toString()));
+	    	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
 	    	  UpdateVisualization();
         	  mediaPlayer.play();
 	      } catch (Exception exc) {
@@ -69,11 +70,14 @@ public class VisualizationInterface extends Application {
 	        	  root.getChildren().remove(1);
 			  if(visualizationChooserComboBox.getValue() == "Spectrum Bars") {
 				  visualization = new SpectrumBars(maximumVolume);
-				  spectrumListener = new SpectrumListener(visualization);
-				  mediaPlayer.setAudioSpectrumThreshold((-1)*maximumVolume);
-		    	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
 			  }
-	    	  root.getChildren().add(visualization);
+			  if(visualizationChooserComboBox.getValue() == "Spectrum Bars Wide") {
+				  visualization = new SpectrumBars(maximumVolume, 12);
+			  }
+			  spectrumListener.setVisualization(visualization);
+			  mediaPlayer.setAudioSpectrumThreshold((-1)*visualization.getMaxVolume());
+	    	  root.getChildren().add(visualization.getNode());
+			  stage.sizeToScene();
 		  }
 	  }
 	  
@@ -83,6 +87,7 @@ public class VisualizationInterface extends Application {
 
 	  @Override
 	  public void start(Stage primaryStage) {
+		  stage = primaryStage;
 		  songFileChooser.setTitle("Open Mp3 File");
 		  primaryStage.setTitle("Audio Player 1");
 		  Scene scene = new Scene(root);
@@ -135,12 +140,14 @@ public class VisualizationInterface extends Application {
 	        });
 
 		  root.getChildren().add(interfaceElements);
+		  primaryStage.setScene(scene);
+		  
     	  mediaPlayer = new MediaPlayer(new Media("file:/"+songChooserTextField.getText().toString()));
+    	  spectrumListener = new SpectrumListener();
+    	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
 		  visualizationChooserComboBox.getSelectionModel().selectFirst();
     	  mediaPlayer.play();
-		  primaryStage.setScene(scene);
-		  primaryStage.sizeToScene();
-		  primaryStage.show();
+    	  
 		  primaryStage.show();
 	  }
 }

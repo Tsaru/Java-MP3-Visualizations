@@ -7,22 +7,28 @@ import javafx.scene.paint.Color;
 
 public class SpectrumListener implements AudioSpectrumListener {
 
+	//Declares the class SpectrumBars as the variable myDisplay
 	SpectrumBars myDisplay;
+	
+	//Declaration of the variables and arrays of the class SpectrumListener
 	private int freqMax;
 	Color[] colorVals;
 	int colorIndex;
 	boolean colorForStart = true;
 	
+	//Class constructor that calls the SpectrumBars constructor and also sets other variabals
 	SpectrumListener(int max) {
 		myDisplay = new SpectrumBars();
 		freqMax = max;
 		generateColorVals();
 	}
 	
+	//Method that returns the value of myDisplay
 	public SpectrumBars getDisplay() {
 		return myDisplay;
 	}
 	
+	//Method that compares the difference between the RGB values and produces a random color based off of the results
 	private Color randomColor(Color currentColor) {
 		int totalDifference = 0;
 		int r = 0, g = 0, b = 0;
@@ -38,6 +44,8 @@ public class SpectrumListener implements AudioSpectrumListener {
 		return new Color((double)r/255.0, (double)g/255.0, (double)b/255.0, 1.0);
 	}
 	
+	
+	//This method generates color values
 	private void generateColorVals() {
 		if(colorForStart)
 			colorForStart = false;
@@ -74,6 +82,8 @@ public class SpectrumListener implements AudioSpectrumListener {
 		}
 	}
 	
+	
+	//Method that updates the spectrum data as the song file is being played
 	@Override
 	public void spectrumDataUpdate( double timestamp, double duration,
 									float[] magnitudes, float[] phases) {

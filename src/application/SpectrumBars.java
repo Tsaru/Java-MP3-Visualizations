@@ -5,12 +5,15 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class SpectrumBars extends Canvas {
+	//Declaration of all the variables in the class SpectrumBars
+	
 	private int numBars, barHeight, rectangleWidth, rectangleHeight, horizontalGap, verticalGap;
 	private Color startColor, endColor, backgroundColor;
 	private final int VERTICAL_PADDING = 6;
 	private final int HORIZONTAL_PADDING = 8;
 	private Color[] colorVals;
 	
+	// Class constructor that initiallizes previously mention variables
 	SpectrumBars() {
 		numBars = 8;
 		barHeight = 12;
@@ -26,6 +29,8 @@ public class SpectrumBars extends Canvas {
 		setColorVals();
 	}
 	
+	
+	//Defined methods that  gets and stores values into the declared variables above
 	public int getNumBars() {
 		return numBars;
 	}
@@ -51,6 +56,8 @@ public class SpectrumBars extends Canvas {
 		return endColor;
 	}
 	
+	
+	//Defined methods that allows for input to be stored into the written variables
 	public void setNumBars(int numBars) {
 		 this.numBars = numBars;
 	}
@@ -76,6 +83,7 @@ public class SpectrumBars extends Canvas {
 		this.endColor = endColor;
 	}
 	
+	//This is a method that colors the spectrum bar when the song is being played
 	private void setColorVals() {
 		colorVals = new Color[barHeight];
 		double rStart = startColor.getRed();
@@ -92,6 +100,8 @@ public class SpectrumBars extends Canvas {
 		}
 	}
 	
+	
+	//This method tests to see if the spectrum bars will be drawn
 	public void DrawTest() {
 		int[] heights;
 		heights = new int[numBars];
@@ -101,6 +111,8 @@ public class SpectrumBars extends Canvas {
 		DrawSpectrumBars(heights);
 	}
 	
+	
+	//This method actually draws the spectrum bars
 	public void DrawSpectrumBars(int[] heights) {
 		GraphicsContext context = getGraphicsContext2D();
 		setWidth(rectangleWidth*numBars+horizontalGap*(numBars+1)+HORIZONTAL_PADDING);

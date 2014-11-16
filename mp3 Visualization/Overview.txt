@@ -1,0 +1,33 @@
+This collection of classes containing:
+	-an interface (VisualizationInterface)
+	-the abstract class Visualization.java from which other visualizations inherit
+	-SpectrumListener.java which implements the AudioSpectrumListener interface,
+	 and is used with a MediaPlayer object
+	
+
+===How the JavaFX code works===
+
+JavaFX provides a Media class, a MediaPlayer class, and an AudioSpectrumListener interface.
+All three of these work together in this program: MediaPlayer plays a media object,
+and calls the SpectrumDataUpdate method of an instance of a class implementing the
+AudioSpectrumListener interface every x seconds.
+
+By default, x is 0.1. For more information, reading about them online is very useful.
+
+
+===Visualization.java and SpectrumListener.java===
+
+An instance of SpectrumListener.java contains a Visualization, and calls it's
+Update method whenever SpectrumDataUpdate is called. It passes four values:
+	double timestamp -> the time in the song at which this call was made
+	double duration -> the duration of this time interval
+	float[] magnitudes -> an array containing the volumes of (by default) 128 frequency bands.
+	float[] phases -> an array containing the phases of (by default) 128 frequency bands.
+So when you are coding a visualization, you have access to all four of those.
+
+Children of Visualization.java must implement two methods: Update and getNode. Update
+is fairly self-explanatory: it gets called every x seconds. You can do whatever you
+want with that information. The purpose of getNode is that your visualization can use
+a Pane object, Cavas object, or any object that inherits from Node. Regardless, it
+will be added to the interface. Some animation prefers a Pane, so for your purposes,
+just pick whatever is easiest.

@@ -49,7 +49,7 @@ public class VisualizationInterface extends Application {
 	  private VBox root = new VBox(10);
 	  
 	  private void StartNewSong() {
-	      try{
+	      try {
 	    	  //System.out.println("file:/"+songChooserTextField.getText());
 	    	  mediaPlayer.stop();
 	    	  mediaPlayer = new MediaPlayer(new Media("file:/"+songChooserTextField.getText().toString()));

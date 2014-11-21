@@ -17,6 +17,6 @@ Things that need to get done:
   New Visualization - Ryan  
   New Visualization - Kevin  
   Documentation - (everyone document your own code)  
-  update platform to condense bands logarithmically - Eden  
-  .wav file support - Eden  
+  update platform to condense bands logarithmically - Eden (done)  
+  .wav file support - Eden (done...nothing to do)
   

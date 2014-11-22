@@ -81,8 +81,8 @@ public class VisualizationInterface extends Application {
 				  visualization = new SpectrumCircles(maximumVolume, 12);
 			  }*/
 			  spectrumListener.setVisualization(visualization);
-			  mediaPlayer.setAudioSpectrumThreshold((-1)*visualization.getMaxVolume());
 			  mediaPlayer.setAudioSpectrumInterval(AUDIO_SPECTRUM_INTERVAL);
+			  mediaPlayer.setAudioSpectrumThreshold((-1)*visualization.getMaxVolume());
 	    	  root.getChildren().add(visualization.getNode());
 			  stage.sizeToScene();
 		  }

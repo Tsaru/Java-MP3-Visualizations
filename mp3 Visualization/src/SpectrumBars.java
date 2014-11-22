@@ -84,7 +84,6 @@ public class SpectrumBars extends Visualization {
 		GraphicsContext context = display.getGraphicsContext2D();
 		display.setWidth(rectangleWidth*numBars+horizontalGap*(numBars+1)+HORIZONTAL_PADDING);
 		display.setHeight(rectangleHeight*barHeight+verticalGap*(barHeight+1)+VERTICAL_PADDING);
-		System.out.println(duration);
 		timeSinceColorUpdate += duration;
 		if(timeSinceColorUpdate >= COLOR_UPDATE_FREQUENCY) {
 			timeSinceColorUpdate = 0;

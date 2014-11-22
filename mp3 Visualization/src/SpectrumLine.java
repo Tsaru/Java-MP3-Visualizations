@@ -15,6 +15,8 @@ public class SpectrumLine extends Visualization {
 	private Color[] colorShiftVals;
 	private boolean isStartColorShifting;
 	private final int COLOR_SHIFT_SPEED = 3;
+	private final boolean smooth = true;
+	private final boolean allowneg = true;
 	Canvas display;
 	FrequencyCompressor compressor;
 
@@ -149,30 +151,57 @@ public class SpectrumLine extends Visualization {
 		context.fillRect(0, 0, display.getWidth(), display.getHeight());
 		context.setStroke(Color.WHITE);
 		context.strokeLine(0,(height/2),width,(height/2));
-		for(int i=0,xcur=edgepadding; i<95; xcur+=xpadding,i++) {
-			ypos[i] = origin - heights[i];
-			if(i == 0){
-			}else if(i == 1){
-				context.setStroke(colorVals[i]);
-				context.strokeLine(xpos[i-1],origin,xpos[i-1],ypos[i-1]);
-				context.strokeLine(xpos[i-1],ypos[i-1],xcur,ypos[i]);
-			}else if(i == 94){
-				context.setStroke(colorVals[i]);
-				context.strokeLine(xpos[i-1],ypos[i-1],xcur,ypos[i]);
-				context.strokeLine(xcur,ypos[i],xcur,origin);
-			}else{
-				context.setStroke(colorVals[i]);
-				context.strokeLine(xpos[i-1],ypos[i-1],xcur,ypos[i]);
+		if(smooth){
+			context.beginPath();
+			for(int i=0,xcur=edgepadding; i<95; xcur+=xpadding,i++) {
+				if(phases[i] < 0 && allowneg){
+					ypos[i] = origin + heights[i];
+				}else{
+					ypos[i] = origin - heights[i];
+				}
+				if(i == 0){
+					context.moveTo(xcur, origin);
+				}else if(i%3 == 0 && !(i >= 92)){
+					context.bezierCurveTo(xpos[i-2], ypos[i-2], xpos[i-1], ypos[i-1], xpos[i], ypos[i]);
+				}else if(i == 94){
+					context.bezierCurveTo(xpos[i-2], ypos[i-2], xpos[i-1], ypos[i-1], xcur, origin);
+				}else{
+				}
+				xpos[i] = xcur; 
 			}
-			xpos[i] = xcur; 
+			context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REFLECT,new Stop(0.0, startColor),new Stop(1.0, endColor)));
+			context.fill();
+			context.closePath();
+		}else{
+			for(int i=0,xcur=edgepadding; i<95; xcur+=xpadding,i++) {
+				if(phases[i] < 0 && allowneg){
+					ypos[i] = origin + heights[i];
+				}else{
+					ypos[i] = origin - heights[i];
+				}
+				if(i == 0){
+				}else if(i == 1){
+					context.setStroke(colorVals[i]);
+					context.strokeLine(xpos[i-1],origin,xpos[i-1],ypos[i-1]);
+					context.strokeLine(xpos[i-1],ypos[i-1],xcur,ypos[i]);
+				}else if(i == 94){
+					context.setStroke(colorVals[i]);
+					context.strokeLine(xpos[i-1],ypos[i-1],xcur,ypos[i]);
+					context.strokeLine(xcur,ypos[i],xcur,origin);
+				}else{
+					context.setStroke(colorVals[i]);
+					context.strokeLine(xpos[i-1],ypos[i-1],xcur,ypos[i]);
+				}
+				xpos[i] = xcur; 
+			}
+			//really ugly fix for fill
+			xpos[95] = xpos[94];
+			xpos[96] = xpos[0];
+			ypos[95] = origin;
+			ypos[96] = origin;
+			context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REFLECT,new Stop(0.0, startColor),new Stop(1.0, endColor)));
+			context.fillPolygon(xpos,ypos,97);
 		}
-		//really ugly fix for fill
-		xpos[95] = xpos[94];
-		xpos[96] = xpos[0];
-		ypos[95] = origin;
-		ypos[96] = origin;
-		context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REFLECT,new Stop(0.0, startColor),new Stop(1.0, endColor)));
-		context.fillPolygon(xpos,ypos,97);
 	}
 
 	@Override

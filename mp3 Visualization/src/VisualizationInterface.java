@@ -39,7 +39,8 @@ public class VisualizationInterface extends Application {
 			    FXCollections.observableArrayList(
 			        "Spectrum Bars",
 			        "Spectrum Bars Wide",
-			        "Visualization 3"
+			        "Spectrum Line",
+			        "Spectrum Circles"
 			    );
 	  private final ComboBox<String> visualizationChooserComboBox = new ComboBox<String>(visualizationList);
 	  
@@ -70,10 +71,14 @@ public class VisualizationInterface extends Application {
 	        	  root.getChildren().remove(1);
 			  if(visualizationChooserComboBox.getValue() == "Spectrum Bars") {
 				  visualization = new SpectrumBars(maximumVolume);
-			  }
-			  if(visualizationChooserComboBox.getValue() == "Spectrum Bars Wide") {
+			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Bars Wide") {
 				  visualization = new SpectrumBars(maximumVolume, 12);
+			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Line") {
+				  visualization = new SpectrumLine(maximumVolume);
 			  }
+			  /*if(visualizationChooserComboBox.getValue() == "Spectrum Circles") {
+				  visualization = new SpectrumCircles(maximumVolume, 12);
+			  }*/
 			  spectrumListener.setVisualization(visualization);
 			  mediaPlayer.setAudioSpectrumThreshold((-1)*visualization.getMaxVolume());
 	    	  root.getChildren().add(visualization.getNode());

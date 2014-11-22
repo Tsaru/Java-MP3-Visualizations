@@ -1,4 +1,5 @@
 import java.util.Random;
+
 import javafx.scene.paint.Color;
 
 /*
@@ -89,8 +90,11 @@ public class Gradient {
 	 */
 	public static Color[] randomColors(int numColors) {
 		Color[] colors = new Color[numColors];
+		Random randGen = new Random(System.currentTimeMillis());
 		for(int i = 0; i < numColors; ++i) {
-			colors[i] = randomColor();
+			colors[i] = new Color((double) Math.abs(randGen.nextInt()%256)/255.0,
+							 	  (double) Math.abs(randGen.nextInt()%256)/255.0,
+							 	  (double) Math.abs(randGen.nextInt()%256)/255.0, 1.0);
 		}
 		return colors;
 	}
@@ -104,10 +108,24 @@ public class Gradient {
 	 * @return  A Color[] variable of length numColors filled with random Color values;
 	 */
 	public static Color[] randomColors(int numColors, int minTotalOffset) {
+		int offset = 0;
+		int r = 0, g = 0, b = 0;
+		Random randGen = new Random(System.currentTimeMillis());
 		Color[] colors = new Color[numColors];
-		colors[0] = randomColor();
+		colors[0] = new Color((double) Math.abs(randGen.nextInt()%256)/255.0,
+			 	  			  (double) Math.abs(randGen.nextInt()%256)/255.0,
+			 	  			  (double) Math.abs(randGen.nextInt()%256)/255.0, 1.0);
 		for(int i = 1; i < numColors; ++i) {
-			colors[i] = randomColor(colors[i-1], minTotalOffset);
+			offset = 0;
+			while(offset < minTotalOffset) {
+				r = Math.abs(randGen.nextInt()%256);
+				g = Math.abs(randGen.nextInt()%256);
+				b = Math.abs(randGen.nextInt()%256);
+				offset = Math.abs((int) ( (double) colors[i-1].getRed()*255.0) - r) +
+			  		  	 Math.abs((int) ( (double) colors[i-1].getGreen()*255.0) - g) +
+			  		  	 Math.abs((int) ( (double) colors[i-1].getBlue()*255.0) - b);
+			}
+			colors[i] = new Color((double)r/255.0, (double)g/255.0, (double)b/255.0, 1.0);
 		}
 		return colors;
 	}
@@ -121,11 +139,14 @@ public class Gradient {
 	 */
 	public static Color[] addRandomColors(Color[] currentColors, int numColors) {
 		Color[] colors = new Color[currentColors.length+numColors];
+		Random randGen = new Random(System.currentTimeMillis());
 		for(int i = 0; i < currentColors.length; ++i) {
 			colors[i] = currentColors[i];
 		}
 		for(int i = currentColors.length; i < colors.length; ++i) {
-			colors[i] = randomColor();
+			colors[i] = new Color((double) Math.abs(randGen.nextInt()%256)/255.0,
+							 	  (double) Math.abs(randGen.nextInt()%256)/255.0,
+							 	  (double) Math.abs(randGen.nextInt()%256)/255.0, 1.0);
 		}
 		return colors;
 	}
@@ -139,12 +160,24 @@ public class Gradient {
 	 * @return A Color[] variable that is filled with the given Color values followed by random Color values;
 	 */
 	public static Color[] addRandomColors(Color[] currentColors, int numColors, int minTotalOffset) {
+		int offset = 0;
+		int r = 0, g = 0, b = 0;
+		Random randGen = new Random(System.currentTimeMillis());
 		Color[] colors = new Color[currentColors.length+numColors];
 		for(int i = 0; i < currentColors.length; ++i) {
 			colors[i] = currentColors[i];
 		}
 		for(int i = currentColors.length; i < colors.length; ++i) {
-			colors[i] = randomColor(colors[i-1], minTotalOffset);
+			offset = 0;
+			while(offset < minTotalOffset) {
+				r = Math.abs(randGen.nextInt()%256);
+				g = Math.abs(randGen.nextInt()%256);
+				b = Math.abs(randGen.nextInt()%256);
+				offset = Math.abs((int) ( (double) colors[i-1].getRed()*255.0) - r) +
+			  		  	 Math.abs((int) ( (double) colors[i-1].getGreen()*255.0) - g) +
+			  		  	 Math.abs((int) ( (double) colors[i-1].getBlue()*255.0) - b);
+			}
+			colors[i] = new Color((double)r/255.0, (double)g/255.0, (double)b/255.0, 1.0);
 		}
 		return colors;
 	}
@@ -219,13 +252,29 @@ public class Gradient {
 		return buildGradient(colors, steps);
 	}
 	
+	/**
+	 * Builds a gradient between two colors, given a maximum change for any given channel for a particular step.
+	 * 
+	 * @param color1 The first color in the gradient.
+	 * @param color2 The end color in the gradient.
+	 * @param maxShift The maximum change for any channel for each step.
+	 * @return A Color array that contains a gradient between the two given colors.
+	 */
 	public static Color[] buildGradient(Color color1, Color color2, double maxShift) {
 		Color[] colors = new Color[2];
 		colors[0] = color1;
 		colors[1] = color2;
 		return buildGradient(colors, maxShift);
 	}
-	
+
+	/**
+	 * Builds a gradient between two colors, given a number of steps between them.
+	 * 
+	 * @param color1 The first color in the gradient.
+	 * @param color2 The end color in the gradient.
+	 * @param steps The number of steps between the two colors.
+	 * @return A Color array of length steps+1 that contains a gradient between the two given colors.
+	 */
 	public static Color[] buildGradient(Color color1, Color color2, int steps) {
 		Color[] colors = new Color[2];
 		colors[0] = color1;

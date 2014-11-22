@@ -26,6 +26,7 @@ import javafx.stage.Stage;
 public class VisualizationInterface extends Application {
 	
 	  final int maximumVolume = 100;
+	  final double AUDIO_SPECTRUM_INTERVAL = 0.01;
 	
 	  private Stage stage;
 	  private final Label songChooserLabel = new Label("Song Location:");
@@ -81,6 +82,7 @@ public class VisualizationInterface extends Application {
 			  }*/
 			  spectrumListener.setVisualization(visualization);
 			  mediaPlayer.setAudioSpectrumThreshold((-1)*visualization.getMaxVolume());
+			  mediaPlayer.setAudioSpectrumInterval(AUDIO_SPECTRUM_INTERVAL);
 	    	  root.getChildren().add(visualization.getNode());
 			  stage.sizeToScene();
 		  }

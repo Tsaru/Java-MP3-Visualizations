@@ -5,14 +5,16 @@ import javafx.scene.paint.Color;
 
 
 public class SpectrumBars extends Visualization {
+	private final double COLOR_SHIFT_SPEED = 3;
+	private final int VERTICAL_PADDING = 6;
+	private final int HORIZONTAL_PADDING = 8;
+	private final double COLOR_UPDATE_FREQUENCY = .1;
 	
 	private int numBars, barHeight, rectangleWidth, rectangleHeight, horizontalGap, verticalGap, colorShiftIndex;
 	private Color bottomColor, topColor, backgroundColor;
-	private final int VERTICAL_PADDING = 6;
-	private final int HORIZONTAL_PADDING = 8;
 	private Color[] colorShiftVals;
 	private boolean isbottomColorShifting;
-	private final double COLOR_SHIFT_SPEED = 3;
+	private double timeSinceColorUpdate;
 	Canvas display;
 	FrequencyCompressor compressor;
 
@@ -44,6 +46,7 @@ public class SpectrumBars extends Visualization {
 		bottomColor = Color.GOLD;
 		topColor = Color.BLUE;
 		backgroundColor = Color.BLACK;
+		timeSinceColorUpdate = 0;
 		colorShiftIndex = 0;
 		colorShiftVals = Gradient.buildRandomGradient(topColor, 210, COLOR_SHIFT_SPEED);
 		
@@ -81,7 +84,12 @@ public class SpectrumBars extends Visualization {
 		GraphicsContext context = display.getGraphicsContext2D();
 		display.setWidth(rectangleWidth*numBars+horizontalGap*(numBars+1)+HORIZONTAL_PADDING);
 		display.setHeight(rectangleHeight*barHeight+verticalGap*(barHeight+1)+VERTICAL_PADDING);
-		incrementColors();
+		System.out.println(duration);
+		timeSinceColorUpdate += duration;
+		if(timeSinceColorUpdate >= COLOR_UPDATE_FREQUENCY) {
+			timeSinceColorUpdate = 0;
+			incrementColors();
+		}
 		Color[] colorVals = Gradient.buildGradient(bottomColor, topColor, barHeight);;
 		int[] heights = processHeights(magnitudes, timestamp);
 		context.setFill(backgroundColor);

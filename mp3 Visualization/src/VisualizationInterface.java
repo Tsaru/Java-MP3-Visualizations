@@ -75,7 +75,7 @@ public class VisualizationInterface extends Application {
 			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Bars Wide") {
 				  visualization = new SpectrumBars(maximumVolume, 12);
 			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Line") {
-				  visualization = new SpectrumLine(maximumVolume);
+				  visualization = new SpectrumLine(maximumVolume, true, false);
 			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Circles") {
 				  visualization = new SpectrumCircles();
 			  }

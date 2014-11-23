@@ -15,20 +15,19 @@ public class SpectrumLine extends Visualization {
 	private double timeSinceColorUpdate;
 	private final int COLOR_SHIFT_SPEED = 3;
 	private final double COLOR_UPDATE_FREQUENCY = .1;
-	private final boolean smooth = true;
-	private final boolean allowneg = false;
+	private boolean smooth, allowneg;
 	Canvas display;
 	FrequencyCompressor compressor;
 
 	SpectrumLine() {
-		this(100);
+		this(100, true, true);
 	}
 	
-	SpectrumLine(int volMax) {
-		this(volMax, 600, 300);
+	SpectrumLine(int volMax, boolean smoothness, boolean neg) {
+		this(volMax, 600, 300, smoothness, neg);
 	}
 	
-	SpectrumLine(int volMax, int w, int h) {
+	SpectrumLine(int volMax, int w, int h, boolean smoothness, boolean neg) {
 		System.out.println("New Spectrum Line");
 		display = new Canvas();
 		compressor = new FrequencyCompressor(volMax);
@@ -46,7 +45,8 @@ public class SpectrumLine extends Visualization {
 		maxheight = ((height/2) - 10);
 		xpadding = width/95;
 		edgepadding = 10 + (width%95)/2;
-
+		smooth = smoothness;
+		allowneg = neg;
 		colorShiftVals = Gradient.buildRandomGradient(topColor, 210, COLOR_SHIFT_SPEED);
 	}
 

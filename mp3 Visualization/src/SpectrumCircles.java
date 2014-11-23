@@ -21,7 +21,7 @@ public class SpectrumCircles extends Visualization  {
 		private final int COLOR_SHIFT_SPEED = 3;
 		private final double COLOR_UPDATE_FREQUENCY = .1;
 		private final boolean smooth = true;
-		private final int NUMPOINTS = 60;
+		private final int NUMPOINTS = 120;
 		private final int RADIUS = 50;
 		private final int CLICK_ADJUSTMENT = 25;
 		private ArrayList<Point> centers;
@@ -96,7 +96,7 @@ public class SpectrumCircles extends Visualization  {
     		final GraphicsContext context = display.getGraphicsContext2D();
     		display.setWidth(width);
     		display.setHeight(height);
-    		context.setFill(Color.BLACK);
+    		context.setFill(backgroundColor);
     		context.fillRect(0, 0, display.getWidth(), display.getHeight());
     		display.addEventHandler(MouseEvent.MOUSE_DRAGGED, 
     			       new EventHandler<MouseEvent>() {
@@ -144,7 +144,7 @@ public class SpectrumCircles extends Visualization  {
 	    					context.bezierCurveTo(xpos[j-2], ypos[j-2], xpos[j-1], ypos[j-1], xpos[j], ypos[j]);
 	    				}
 		    		}
-	    			context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REFLECT,new Stop(0.0, topColor),new Stop(1.0, bottomColor)));
+	    			context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REPEAT,new Stop(0.0, topColor),new Stop(1.0, bottomColor)));
 	    			context.fill();
 	    			context.closePath();
         		}else{
@@ -157,11 +157,11 @@ public class SpectrumCircles extends Visualization  {
 							context.strokeLine(xpos[j-1],ypos[j-1],xpos[j],ypos[i]);
 						}
 					}
-	    			context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REFLECT,new Stop(0.0, topColor),new Stop(1.0, bottomColor)));
+	    			context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REPEAT,new Stop(0.0, topColor),new Stop(1.0, bottomColor)));
 	    			context.fillPolygon(xpos,ypos,NUMPOINTS);
         		}
-        		//context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REFLECT,new Stop(0.0, Color.DARKMAGENTA),new Stop(1.0, Color.GOLD)));
-        		//context.fillOval((xcent + 50), (ycent + 50), RADIUS, RADIUS);
+        		context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REPEAT,new Stop(0.0, topColor),new Stop(1.0, bottomColor)));
+        		context.fillOval((xcent + 50), (ycent + 50), RADIUS, RADIUS);
         	}
         }
         

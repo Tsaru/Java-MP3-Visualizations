@@ -26,7 +26,7 @@ import javafx.stage.Stage;
 public class VisualizationInterface extends Application {
 	
 	  final int maximumVolume = 100;
-	  final double AUDIO_SPECTRUM_INTERVAL = 0.01;
+	  final double AUDIO_SPECTRUM_INTERVAL = 0.08;
 	
 	  private Stage stage;
 	  private final Label songChooserLabel = new Label("Song Location:");
@@ -76,10 +76,9 @@ public class VisualizationInterface extends Application {
 				  visualization = new SpectrumBars(maximumVolume, 12);
 			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Line") {
 				  visualization = new SpectrumLine(maximumVolume);
+			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Circles") {
+				  visualization = new SpectrumCircles();
 			  }
-			  /*if(visualizationChooserComboBox.getValue() == "Spectrum Circles") {
-				  visualization = new SpectrumCircles(maximumVolume, 12);
-			  }*/
 			  spectrumListener.setVisualization(visualization);
 			  mediaPlayer.setAudioSpectrumInterval(AUDIO_SPECTRUM_INTERVAL);
 			  mediaPlayer.setAudioSpectrumThreshold((-1)*visualization.getMaxVolume());

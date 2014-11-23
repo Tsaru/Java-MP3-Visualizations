@@ -89,7 +89,7 @@ public class SpectrumBars extends Visualization {
 			timeSinceColorUpdate = 0;
 			incrementColors();
 		}
-		Color[] colorVals = Gradient.buildGradient(bottomColor, topColor, barHeight);;
+		Color[] colorVals = Gradient.buildGradient(bottomColor, topColor, barHeight);
 		int[] heights = processHeights(magnitudes, timestamp);
 		context.setFill(backgroundColor);
 		context.fillRect(0, 0, display.getWidth(), display.getHeight());

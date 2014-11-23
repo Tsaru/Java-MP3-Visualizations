@@ -1,5 +1,3 @@
-import java.util.Random;
-
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -11,12 +9,14 @@ import javafx.scene.paint.Stop;
 public class SpectrumLine extends Visualization {
 	private int maxheight, width, height, edgepadding, xpadding, colorShiftIndex;
 	private double[] ypos, xpos;
-	private Color startColor, endColor, backgroundColor;
+	private Color bottomColor, topColor, backgroundColor;
 	private Color[] colorShiftVals;
-	private boolean isStartColorShifting;
+	private boolean isbottomColorShifting;
+	private double timeSinceColorUpdate;
 	private final int COLOR_SHIFT_SPEED = 3;
+	private final double COLOR_UPDATE_FREQUENCY = .1;
 	private final boolean smooth = true;
-	private final boolean allowneg = true;
+	private final boolean allowneg = false;
 	Canvas display;
 	FrequencyCompressor compressor;
 
@@ -32,7 +32,7 @@ public class SpectrumLine extends Visualization {
 		System.out.println("New Spectrum Line");
 		display = new Canvas();
 		compressor = new FrequencyCompressor(volMax);
-		isStartColorShifting = false;
+		isbottomColorShifting = false;
 		maxVolume = volMax;
 		width = w;
 		height = h;
@@ -40,94 +40,33 @@ public class SpectrumLine extends Visualization {
 		xpos = new double[97];
 		display.setWidth(width);
 		display.setHeight(height);
-		startColor = Color.GOLD;
-		endColor = Color.BLUE;
+		topColor = Color.GOLD;
+		bottomColor = Color.BLUE;
 		backgroundColor = Color.BLACK;
 		maxheight = ((height/2) - 10);
 		xpadding = width/95;
 		edgepadding = 10 + (width%95)/2;
-		updateColorShiftVals();
+
+		colorShiftVals = Gradient.buildRandomGradient(topColor, 210, COLOR_SHIFT_SPEED);
 	}
-	
-	private Color randomColor() {
-		int startDifference = 0, endDifference = 0;
-		int r = 0, g = 0, b = 0;
-		Random randGen = new Random(System.currentTimeMillis());
-		while(startDifference < 100 || endDifference < 100) {
-			r = Math.abs(randGen.nextInt()%256);
-			g = Math.abs(randGen.nextInt()%256);
-			b = Math.abs(randGen.nextInt()%256);
-			startDifference = Math.abs((int) ( (double) startColor.getRed()*255.0) - r) +
-			  		  		  Math.abs((int) ( (double) startColor.getGreen()*255.0) - g) +
-			  		  		  Math.abs((int) ( (double) startColor.getBlue()*255.0) - b);
-			endDifference = Math.abs((int) ( (double) endColor.getRed()*255.0) - r) +
-			  		  		Math.abs((int) ( (double) endColor.getGreen()*255.0) - g) +
-			  		  		Math.abs((int) ( (double) endColor.getBlue()*255.0) - b);
-		}
-		return new Color((double)r/255.0, (double)g/255.0, (double)b/255.0, 1.0);
-	}
-	
-	private void updateColorShiftVals() {
-		Color currentColor, finalColor;
-		colorShiftIndex = 0;
-		if(isStartColorShifting) {
-			isStartColorShifting = false;
-			currentColor = endColor;
-		}
-		else {
-			isStartColorShifting = true;
-			currentColor = startColor;
-		}
-		finalColor = randomColor();
-		double rStart = currentColor.getRed();
-		double gStart = currentColor.getGreen();
-		double bStart = currentColor.getBlue();
-		double rDifference = finalColor.getRed()-rStart;
-		double gDifference = finalColor.getGreen()-gStart;
-		double bDifference = finalColor.getBlue()-bStart;
-		
-		double maxDifference = Math.abs(rDifference);
-		if(maxDifference < Math.abs(gDifference))
-			maxDifference = Math.abs(gDifference);
-		if(maxDifference < Math.abs(bDifference))
-			maxDifference = Math.abs(bDifference);
-		
-		int numSteps = (int)(((maxDifference*255.0)/COLOR_SHIFT_SPEED)+.5);
-		colorShiftVals = new Color[numSteps];
-		
-		for(int i = 0; i < numSteps; ++i) {
-			colorShiftVals[i] = new Color(rStart+rDifference/(double)numSteps*i,
-					 				 gStart+gDifference/(double)numSteps*i,
-					 				 bStart+bDifference/(double)numSteps*i,
-									 1.0);
-		}
-	}
-	
+
 	private void incrementColors() {
-		if(isStartColorShifting)
-			startColor = colorShiftVals[colorShiftIndex];
+		if(isbottomColorShifting)
+			bottomColor = colorShiftVals[colorShiftIndex];
 		else
-			endColor = colorShiftVals[colorShiftIndex];
+			topColor = colorShiftVals[colorShiftIndex];
 		colorShiftIndex += 1;
-		if(colorShiftIndex == colorShiftVals.length)
-			updateColorShiftVals();
-	}
-	
-	private Color[] getColorVals() {
-		Color[] colorVals = new Color[128];
-		double rStart = startColor.getRed();
-		double gStart = startColor.getGreen();
-		double bStart = startColor.getBlue();
-		double rEnd = endColor.getRed();
-		double gEnd = endColor.getGreen();
-		double bEnd = endColor.getBlue();
-		for(int i = 0; i < 128; ++i) {
-			colorVals[i] = new Color(rStart+(rEnd-rStart)/128*i,
-									 gStart+(gEnd-gStart)/128*i,
-									 bStart+(bEnd-bStart)/128*i,
-									 1.0);
+		if(colorShiftIndex == colorShiftVals.length) {
+			colorShiftIndex = 0;
+			if(isbottomColorShifting) {
+				isbottomColorShifting = false;
+				colorShiftVals = Gradient.buildRandomGradient(topColor, 210, COLOR_SHIFT_SPEED);
+			}
+			else {
+				isbottomColorShifting = true;
+				colorShiftVals = Gradient.buildRandomGradient(bottomColor, 210, COLOR_SHIFT_SPEED);
+			}
 		}
-		return colorVals;
 	}
 	
 	private int[] processHeights(float[] magnitudes, double timestamp) {
@@ -143,8 +82,12 @@ public class SpectrumLine extends Visualization {
 		GraphicsContext context = display.getGraphicsContext2D();
 		display.setWidth(width);
 		display.setHeight(height);
-		incrementColors();
-		Color[] colorVals = getColorVals();
+		timeSinceColorUpdate += duration;
+		if(timeSinceColorUpdate >= COLOR_UPDATE_FREQUENCY) {
+			timeSinceColorUpdate = 0;
+			incrementColors();
+		}
+		Color[] colorVals = Gradient.buildGradient(bottomColor, topColor, height);
 		int[] heights = processHeights(magnitudes, timestamp);
 		int origin = height/2;
 		context.setFill(backgroundColor);
@@ -169,7 +112,7 @@ public class SpectrumLine extends Visualization {
 				}
 				xpos[i] = xcur; 
 			}
-			context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REFLECT,new Stop(0.0, startColor),new Stop(1.0, endColor)));
+			context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REFLECT,new Stop(0.0, topColor),new Stop(1.0, bottomColor)));
 			context.fill();
 			context.closePath();
 		}else{
@@ -199,7 +142,7 @@ public class SpectrumLine extends Visualization {
 			xpos[96] = xpos[0];
 			ypos[95] = origin;
 			ypos[96] = origin;
-			context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REFLECT,new Stop(0.0, startColor),new Stop(1.0, endColor)));
+			context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REFLECT,new Stop(0.0, topColor),new Stop(1.0, bottomColor)));
 			context.fillPolygon(xpos,ypos,97);
 		}
 	}

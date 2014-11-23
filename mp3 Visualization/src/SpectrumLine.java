@@ -1,3 +1,14 @@
+/**
+ * Spectrum Line
+ * 
+ * Spectrum Line is a class that takes the data from spectrum listener and
+ * outputs a visualization of a graph onto a canvas.  It extends the abstract
+ * class Visualization.
+ * 
+ * @author Ryan Golden
+ * @date: November 23, 2014. 
+ */
+
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -27,6 +38,15 @@ public class SpectrumLine extends Visualization {
 		this(volMax, 600, 300, smoothness, neg);
 	}
 	
+	/**
+	 * The main constructor for SpectrumLine
+	 * 
+	 * @param volMax 		the max volume passed from the music player
+	 * @param w 			the width of the canvas
+	 * @param h 			the hieght of the canvas
+	 * @param smoothness 	whether the graph is smooth or jagged
+	 * @param neg			whether the graph has negative values
+	 */
 	SpectrumLine(int volMax, int w, int h, boolean smoothness, boolean neg) {
 		System.out.println("New Spectrum Line");
 		display = new Canvas();
@@ -50,6 +70,9 @@ public class SpectrumLine extends Visualization {
 		colorShiftVals = Gradient.buildRandomGradient(topColor, 210, COLOR_SHIFT_SPEED);
 	}
 
+	/**
+	 * Using the Gradient Class increments the colors seen in the graph
+	 */
 	private void incrementColors() {
 		if(isbottomColorShifting)
 			bottomColor = colorShiftVals[colorShiftIndex];
@@ -69,6 +92,12 @@ public class SpectrumLine extends Visualization {
 		}
 	}
 	
+	/**
+	 * Uses the compressor to logarithmically make the magnitudes even and gives asthetically pleasing heights back
+	 * @param magnitudes 	the magnitudes supplied by Update
+	 * @param timestamp		the time supplied by Update
+	 * @return				The heights used on the line graph
+	 */
 	private int[] processHeights(float[] magnitudes, double timestamp) {
 		float[] buckets = compressor.compressHeights(magnitudes, 128, timestamp);
 		int[] heights = new int[95];
@@ -78,6 +107,14 @@ public class SpectrumLine extends Visualization {
 		return heights;
 	}
 	
+	/**
+	 * Updates the Canvas of the graph for a certain time interval
+	 * 
+	 * @param timestamp		the time after the spectrum listener started	
+	 * @param duration		the time between each interval
+	 * @param magnitudes	the magnitudes of each frequency used for height
+	 * @param phases		the phases of each frequency used to make negative points
+	 */
 	public void Update(double timestamp, double duration, float[] magnitudes, float[] phases) {
 		GraphicsContext context = display.getGraphicsContext2D();
 		display.setWidth(width);
@@ -147,6 +184,9 @@ public class SpectrumLine extends Visualization {
 		}
 	}
 
+	/**
+	 * Returns the Canvas to the interface
+	 */
 	@Override
 	public Node getNode() {
 		return display;

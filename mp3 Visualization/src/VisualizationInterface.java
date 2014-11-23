@@ -75,9 +75,9 @@ public class VisualizationInterface extends Application {
 			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Bars Wide") {
 				  visualization = new SpectrumBars(maximumVolume, 12);
 			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Line") {
-				  visualization = new SpectrumLine(maximumVolume, true, false);
+				  visualization = new SpectrumLine(maximumVolume, true, false);//want to beable to choose smoothness and neg
 			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Circles") {
-				  visualization = new SpectrumCircles();
+				  visualization = new SpectrumCircles(200);//want to configure 100-200
 			  }
 			  spectrumListener.setVisualization(visualization);
 			  mediaPlayer.setAudioSpectrumInterval(AUDIO_SPECTRUM_INTERVAL);

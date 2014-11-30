@@ -41,6 +41,8 @@ public class VisualizationInterface extends Application {
 	  private final BorderPane interfacePane = new BorderPane();
 	  private final Button directoryBrowseButton = new Button("Open Playlist");
 	  private final DirectoryChooser directoryBrowse = new DirectoryChooser();
+	  private final Button playButton = new Button("Play");
+	  private final Button pauseButton = new Button("Pause");
 	  
 	  private final Label visualizationChooserLabel = new Label("Visualization Mode");
 	  private final ObservableList<String> visualizationList = 
@@ -62,7 +64,6 @@ public class VisualizationInterface extends Application {
 	  
 	  private void StartNewSong(String song_pathname) {
 	      try {
-	    	  //System.out.println("file:/"+songChooserTextField.getText());
 	    	  mediaPlayer.stop();
 	    	  mediaPlayer = new MediaPlayer(new Media("file:/"+song_pathname));//+songChooserTextField.getText().toString()));
 	    	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
@@ -71,7 +72,7 @@ public class VisualizationInterface extends Application {
 	      } catch (Exception exc) {
 	    	  exc.printStackTrace();
 	    	  JOptionPane.showMessageDialog(null,
-	        			"Error loading song!", "Mp3 Visualizer",
+	        			"An error occurred trying to load the selected song. Please try again.", "Visual Eyes",
 	        			JOptionPane.WARNING_MESSAGE);
 	      }
 	  }
@@ -79,7 +80,6 @@ public class VisualizationInterface extends Application {
 	  private void UpdateVisualization() {
 		  if(visualizationChooserComboBox.getValue() != null) {
 			  if(visualization != null)
-	        	  //root.getChildren().remove(1);
 				  interfacePane.setCenter(null);
 			  if(visualizationChooserComboBox.getValue() == "Spectrum Bars") {
 				  visualization = new SpectrumBars(maximumVolume);
@@ -93,7 +93,6 @@ public class VisualizationInterface extends Application {
 			  spectrumListener.setVisualization(visualization);
 			  mediaPlayer.setAudioSpectrumInterval(AUDIO_SPECTRUM_INTERVAL);
 			  mediaPlayer.setAudioSpectrumThreshold((-1)*visualization.getMaxVolume());
-	    	  //root.getChildren().add(visualization.getNode());
 			  interfacePane.setCenter(visualization.getNode()); // The visualizer occupies the center portion of the screen
 			  stage.sizeToScene();
 		  }
@@ -111,13 +110,17 @@ public class VisualizationInterface extends Application {
 	  private void loadAllAudioFiles(File dir) {
 		  // listOfSongs.clear(); // TODO: do we want loading audio files to destroy the list of previous songs?
 		  if(dir!=null) { // null can be passed in if the user cancels the directory-chooser dialog
-			  File[] allFiles = dir.listFiles();
-			  
-			  for(File f : allFiles) {
-				  if(f.isFile() && (f.getName().endsWith(".wav") || f.getName().endsWith(".mp3")))
-					  listOfSongs.add(f.getAbsolutePath());
+			  try {
+				  File[] allFiles = dir.listFiles();
+				  for(File f : allFiles) {
+					  if(f.isFile() && (f.getName().endsWith(".wav") || f.getName().endsWith(".mp3")))
+						  listOfSongs.add(f.getAbsolutePath());
+					  
+				  }
 				  
 			  }
+			  catch(SecurityException se) { } // i.e. permissions not granted to read specified directory
+			  catch(Exception e) { }
 		  }
 		  else { /* Do nothing */ }
 	  }
@@ -136,9 +139,9 @@ public class VisualizationInterface extends Application {
 			  if(sChar.toCharArray()[0]==' ') 
 				  holder += "%20";
 			  else if(sChar.toCharArray()[0]=='\\') 
-				 holder += "/";
+				  holder += "/";
 			  else 
-				  holder += str.substring(i, i+1);
+				  holder += sChar;
 		  }
 		  return holder;
 	  }
@@ -154,18 +157,20 @@ public class VisualizationInterface extends Application {
 		  interfaceElements.setVgap(5);
 		  interfaceElements.setHgap(5);
 		  
-		  HBox topBarElements = new HBox();
 		  
 		  /*interfaceElements.add(songChooserLabel, 0, 0);
 		  interfaceElements.add(songChooserTextField, 1, 0, 2, 1);
 		  interfaceElements.add(songOpenButton, 3, 0);
 		  interfaceElements.add(songBrowseButton, 4, 0);*/
 		  
+		  HBox topBarElements = new HBox();
 		  topBarElements.getChildren().addAll(/*songChooserLabel,songChooserTextField,songOpenButton,songBrowseButton,*/
 				  visualizationChooserLabel,visualizationChooserComboBox,directoryBrowseButton);
 		  
-		  //interfaceElements.add(songListView, 20, 20); // goes on the right side of the screen
-		  
+		  HBox controlElements = new HBox();
+		  controlElements.getChildren().addAll(playButton,pauseButton);
+		  controlElements.setAlignment(Pos.CENTER);
+
 		  //interfaceElements.add(visualizationChooserLabel, 0, 1);
 		  //interfaceElements.add(visualizationChooserComboBox, 1, 1, 2, 1);
 		  
@@ -177,6 +182,19 @@ public class VisualizationInterface extends Application {
 				  loadAllAudioFiles(dir);
 			  }
 			  
+		  });
+		  
+		  playButton.setOnAction(new EventHandler<ActionEvent>() {
+			  @Override
+			  public void handle(ActionEvent e) {
+				  mediaPlayer.play();
+			  }
+		  });
+		  pauseButton.setOnAction(new EventHandler<ActionEvent>() {
+			  @Override
+			  public void handle(ActionEvent e) {
+				  mediaPlayer.pause();
+			  }
 		  });
 
 		  /*songOpenButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -225,7 +243,7 @@ public class VisualizationInterface extends Application {
 		  //root.getChildren().add(interfaceElements);
 		  interfacePane.setTop(topBarElements);
 		  interfacePane.setRight(songListView);
-		  // interfacePane.setCenter(_); // we already set the center pane to be the visualizer
+		  interfacePane.setBottom(controlElements);
 		  root.getChildren().add(interfacePane);
 		  primaryStage.setScene(scene);
 		  
@@ -234,7 +252,7 @@ public class VisualizationInterface extends Application {
     	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
 		  visualizationChooserComboBox.getSelectionModel().selectFirst();
     	  mediaPlayer.play();
-    	  
+
 		  primaryStage.show();
 	  }
 }

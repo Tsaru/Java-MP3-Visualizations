@@ -11,12 +11,16 @@ Greg Lang
 
 Things that need to get done:  
   Style/fancy up interface - Greg  
-  Playlist-style library - Greg  
-  song control - Greg  
-  Add microphone support - Cullen  
-  New Visualization - Ryan  
-  New Visualization - Kevin  
-  Documentation - (everyone document your own code)  
+  Playlist-style library - Greg (done)  
+  Song control - Greg (done)
+  Add microphone support - Cullen   
+  Spectrum line - Ryan (done)
+  Spectrum circles - Ryan (done)
+  Pixel fountain - Kevin
+  Framework - Eden (done)
+  Color shifting - Eden (done)
+  Frequency compression - Eden (done)
   update platform to condense bands logarithmically - Eden (done)  
-  .wav file support - Eden (done...nothing to do)
+  .wav file support - Eden (done)
+  Documentation - (everyone document your own code)  
   

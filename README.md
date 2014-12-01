@@ -20,7 +20,6 @@ Things that need to get done:
   Framework - Eden (done)<br>
   Color shifting - Eden (done)<br>
   Frequency compression - Eden (done)<br>
-  update platform to condense bands logarithmically - Eden (done)  
   .wav file support - Eden (done)<br>
   Documentation - (everyone document your own code)  
   

@@ -13,7 +13,7 @@ Things that need to get done:
   Style/fancy up interface - Greg  
   Playlist-style library - Greg (done)  
   Song control - Greg (done)<br>
-  Add microphone support - Cullen   
+  Microphone support - Cullen   
   Spectrum line - Ryan (done)<br>
   Spectrum circles - Ryan (done)<br>
   General UML Diagram - Ryan (done)<br>

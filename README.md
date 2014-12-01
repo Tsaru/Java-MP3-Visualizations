@@ -16,6 +16,7 @@ Things that need to get done:
   Add microphone support - Cullen   
   Spectrum line - Ryan (done)<br>
   Spectrum circles - Ryan (done)<br>
+  General UML Diagram - Ryan (done)<br>
   Pixel fountain - Kevin<br>
   Framework - Eden (done)<br>
   Color shifting - Eden (done)<br>

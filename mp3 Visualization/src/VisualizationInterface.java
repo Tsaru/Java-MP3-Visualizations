@@ -33,11 +33,6 @@ public class VisualizationInterface extends Application {
 	  final double AUDIO_SPECTRUM_INTERVAL = 0.08;
 	
 	  private Stage stage;
-	  //private final Label songChooserLabel = new Label("Song Location:");
-	  private final TextField songChooserTextField = new TextField(getClass().getResource("Train - Drops of Jupiter.mp3").toString().substring(6));
-	  //private final Button songOpenButton = new Button("Open");
-	  //private final Button songBrowseButton = new Button("Browse");
-	  private final FileChooser songFileChooser = new FileChooser();
 	  private final BorderPane interfacePane = new BorderPane();
 	  private final Button directoryBrowseButton = new Button("Open Playlist");
 	  private final DirectoryChooser directoryBrowse = new DirectoryChooser();
@@ -65,7 +60,7 @@ public class VisualizationInterface extends Application {
 	  private void StartNewSong(String song_pathname) {
 	      try {
 	    	  mediaPlayer.stop();
-	    	  mediaPlayer = new MediaPlayer(new Media("file:/"+song_pathname));//+songChooserTextField.getText().toString()));
+	    	  mediaPlayer = new MediaPlayer(new Media("file:/"+song_pathname));
 	    	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
 	    	  UpdateVisualization();
         	  mediaPlayer.play();
@@ -115,7 +110,8 @@ public class VisualizationInterface extends Application {
 				  for(File f : allFiles) {
 					  if(f.isFile() && (f.getName().endsWith(".wav") || f.getName().endsWith(".mp3")))
 						  listOfSongs.add(f.getAbsolutePath());
-					  
+					  else if(f.isDirectory())
+						  loadAllAudioFiles(f); // recursive call to search sub-directories
 				  }
 				  
 			  }
@@ -149,7 +145,6 @@ public class VisualizationInterface extends Application {
 	  @Override
 	  public void start(Stage primaryStage) {
 		  stage = primaryStage;
-		  songFileChooser.setTitle("Open Mp3 File");
 		  primaryStage.setTitle("Visual Eyes"); // clever name sounds like "visualize"
 		  Scene scene = new Scene(root);
 		  GridPane interfaceElements = new GridPane();
@@ -157,23 +152,12 @@ public class VisualizationInterface extends Application {
 		  interfaceElements.setVgap(5);
 		  interfaceElements.setHgap(5);
 		  
-		  
-		  /*interfaceElements.add(songChooserLabel, 0, 0);
-		  interfaceElements.add(songChooserTextField, 1, 0, 2, 1);
-		  interfaceElements.add(songOpenButton, 3, 0);
-		  interfaceElements.add(songBrowseButton, 4, 0);*/
-		  
 		  HBox topBarElements = new HBox();
-		  topBarElements.getChildren().addAll(/*songChooserLabel,songChooserTextField,songOpenButton,songBrowseButton,*/
-				  visualizationChooserLabel,visualizationChooserComboBox,directoryBrowseButton);
+		  topBarElements.getChildren().addAll(visualizationChooserLabel,visualizationChooserComboBox,directoryBrowseButton);
 		  
 		  HBox controlElements = new HBox();
 		  controlElements.getChildren().addAll(playButton,pauseButton);
 		  controlElements.setAlignment(Pos.CENTER);
-
-		  //interfaceElements.add(visualizationChooserLabel, 0, 1);
-		  //interfaceElements.add(visualizationChooserComboBox, 1, 1, 2, 1);
-		  
 		  
 		  directoryBrowseButton.setOnAction(new EventHandler<ActionEvent>() {
 			  @Override
@@ -181,7 +165,6 @@ public class VisualizationInterface extends Application {
 				  File dir = directoryBrowse.showDialog(primaryStage);
 				  loadAllAudioFiles(dir);
 			  }
-			  
 		  });
 		  
 		  playButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -196,33 +179,6 @@ public class VisualizationInterface extends Application {
 				  mediaPlayer.pause();
 			  }
 		  });
-
-		  /*songOpenButton.setOnAction(new EventHandler<ActionEvent>() {
-				 
-			  @Override
-			  public void handle(ActionEvent e) {
-				  StartNewSong();
-			  	}
-		  });*/
-			
-		  /*songBrowseButton.setOnAction(new EventHandler<ActionEvent>() {
-				
-			  @Override
-			  public void handle(ActionEvent e) {
-				  File file = songFileChooser.showOpenDialog(songBrowseButton.getScene().getWindow());
-				  if(file != null) {
-					  try {
-						  songChooserTextField.setText(file.toURI().toURL().toString().substring(6));
-					  }	catch (Exception exc) {
-						  exc.printStackTrace();
-						  JOptionPane.showMessageDialog(null,
-			        				"An error occurred while trying to load specified song.", "Open Song",
-			        				JOptionPane.WARNING_MESSAGE);
-					  }
-					  StartNewSong();
-				  }
-			  }
-		  });*/
 		  
 		  visualizationChooserComboBox.valueProperty().addListener(new ChangeListener<String>() {
 	            public void changed(ObservableValue<? extends String> ov,
@@ -232,7 +188,7 @@ public class VisualizationInterface extends Application {
 	        });
 		  
 		  songListView.getSelectionModel().selectedItemProperty().addListener(
-				  new ChangeListener<String>() { // event-listener associated with the user selecting a different song from the listview
+				  new ChangeListener<String>() { // event-listener for the user selecting a different song from the listview
 					  public void changed(ObservableValue<? extends String> ov,
 							  String old_val, String new_val) {
 						  StartNewSong(encodeURL(new_val));
@@ -240,14 +196,13 @@ public class VisualizationInterface extends Application {
 				  });
 		  
 
-		  //root.getChildren().add(interfaceElements);
 		  interfacePane.setTop(topBarElements);
 		  interfacePane.setRight(songListView);
 		  interfacePane.setBottom(controlElements);
 		  root.getChildren().add(interfacePane);
 		  primaryStage.setScene(scene);
 		  
-    	  mediaPlayer = new MediaPlayer(new Media("file:/"+songChooserTextField.getText().toString()));
+    	  mediaPlayer = new MediaPlayer(new Media("file:/"+getClass().getResource("Train - Drops of Jupiter.mp3").toString().substring(6)));
     	  spectrumListener = new SpectrumListener();
     	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
 		  visualizationChooserComboBox.getSelectionModel().selectFirst();

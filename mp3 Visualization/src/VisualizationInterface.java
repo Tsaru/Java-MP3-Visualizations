@@ -1,4 +1,6 @@
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JOptionPane;
 
@@ -15,7 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -23,7 +25,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 
@@ -38,6 +39,8 @@ public class VisualizationInterface extends Application {
 	  private final DirectoryChooser directoryBrowse = new DirectoryChooser();
 	  private final Button playButton = new Button("Play");
 	  private final Button pauseButton = new Button("Pause");
+	  private final Slider slideDisplay = new Slider(0,1,0);
+	  private final Label durationLabel = new Label("");
 	  
 	  private final Label visualizationChooserLabel = new Label("Visualization Mode");
 	  private final ObservableList<String> visualizationList = 
@@ -57,13 +60,21 @@ public class VisualizationInterface extends Application {
 	  private ObservableList<String> listOfSongs = FXCollections.observableArrayList(); // contains the list of songs the user can play
 	  private final ListView<String> songListView = new ListView<String>(listOfSongs);
 	  
+	  private final Map<String,String> songNameLocMap = new HashMap<String,String>(); // Song name -> Song path (eg. Song1 -> C:\Users\..\Song1.mp3)
+	  
 	  private void StartNewSong(String song_pathname) {
 	      try {
 	    	  mediaPlayer.stop();
 	    	  mediaPlayer = new MediaPlayer(new Media("file:/"+song_pathname));
 	    	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
 	    	  UpdateVisualization();
+	    	  
+	    	  slideDisplay.setMin(0d);
+	    	  slideDisplay.setMax(mediaPlayer.getTotalDuration().toSeconds());
+	    	  durationLabel.setText(mediaPlayer.getCurrentTime().toString());
+	    	  
         	  mediaPlayer.play();
+        	  
 	      } catch (Exception exc) {
 	    	  exc.printStackTrace();
 	    	  JOptionPane.showMessageDialog(null,
@@ -103,20 +114,24 @@ public class VisualizationInterface extends Application {
 	   * @param dir The directory in which to search for audio files
 	   */
 	  private void loadAllAudioFiles(File dir) {
-		  // listOfSongs.clear(); // TODO: do we want loading audio files to destroy the list of previous songs?
+		  // listOfSongs.clear(); // remove comment if we want loading audio files to destroy the current list of songs
 		  if(dir!=null) { // null can be passed in if the user cancels the directory-chooser dialog
 			  try {
 				  File[] allFiles = dir.listFiles();
 				  for(File f : allFiles) {
-					  if(f.isFile() && (f.getName().endsWith(".wav") || f.getName().endsWith(".mp3")))
-						  listOfSongs.add(f.getAbsolutePath());
-					  else if(f.isDirectory())
+					  if(f.isFile() && (f.getName().endsWith(".wav") || f.getName().endsWith(".mp3"))) {
+						  String songNameNoExt = f.getName().substring(0, f.getName().indexOf(".")); // Drops of Jupiter, not Drops of Jupiter.mp3
+						  songNameLocMap.put(songNameNoExt, f.getAbsolutePath());
+						  listOfSongs.add(songNameNoExt);
+					  }
+					  else if(f.isDirectory()) {
 						  loadAllAudioFiles(f); // recursive call to search sub-directories
+					  }
 				  }
 				  
 			  }
 			  catch(SecurityException se) { } // i.e. permissions not granted to read specified directory
-			  catch(Exception e) { }
+			  catch(Exception e) { } // error occurred in loading directory or adding file to map
 		  }
 		  else { /* Do nothing */ }
 	  }
@@ -143,7 +158,7 @@ public class VisualizationInterface extends Application {
 	  }
 	  
 	  @Override
-	  public void start(final Stage primaryStage) {
+	  public void start(Stage primaryStage) {
 		  stage = primaryStage;
 		  primaryStage.setTitle("Visual Eyes"); // clever name sounds like "visualize"
 		  Scene scene = new Scene(root);
@@ -155,9 +170,17 @@ public class VisualizationInterface extends Application {
 		  HBox topBarElements = new HBox();
 		  topBarElements.getChildren().addAll(visualizationChooserLabel,visualizationChooserComboBox,directoryBrowseButton);
 		  
-		  HBox controlElements = new HBox();
-		  controlElements.getChildren().addAll(playButton,pauseButton);
-		  controlElements.setAlignment(Pos.CENTER);
+		  VBox controlElements = new VBox();
+		  
+		  HBox songControls = new HBox();
+		  songControls.getChildren().addAll(playButton,pauseButton);
+		  songControls.setAlignment(Pos.CENTER);
+		  
+		  HBox songDurationDisplay = new HBox();
+		  slideDisplay.setMinWidth(400d);
+		  songDurationDisplay.getChildren().addAll(durationLabel,slideDisplay);
+		  
+		  controlElements.getChildren().addAll(songControls/*,songDurationDisplay*/);
 		  
 		  directoryBrowseButton.setOnAction(new EventHandler<ActionEvent>() {
 			  @Override
@@ -191,11 +214,10 @@ public class VisualizationInterface extends Application {
 				  new ChangeListener<String>() { // event-listener for the user selecting a different song from the listview
 					  public void changed(ObservableValue<? extends String> ov,
 							  String old_val, String new_val) {
-						  StartNewSong(encodeURL(new_val));
+						  StartNewSong(encodeURL(songNameLocMap.get(new_val)));
 					  }
 				  });
 		  
-
 		  interfacePane.setTop(topBarElements);
 		  interfacePane.setRight(songListView);
 		  interfacePane.setBottom(controlElements);

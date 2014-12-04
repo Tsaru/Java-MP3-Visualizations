@@ -94,7 +94,7 @@ public class SpectrumCircles extends Visualization  {
         }
         
         /**
-         * Checks to see if the person clicked within a circle that is already made
+         * Checks to see if the person clicked within a circle that is alread made
          * @param x		the x pos of where the user clicked
          * @param y		the y pos of where the user clicked
          * @return		the index of the circle is is inside, -1 if none
@@ -103,17 +103,13 @@ public class SpectrumCircles extends Visualization  {
         	int size = centers.size();
         	int newx = (int)x-RADIUS-CLICK_ADJUSTMENT;
         	int newy = (int)y-RADIUS-CLICK_ADJUSTMENT;
-        	int selected = -1;
-        	try{
-	        	for(int i = 0; i < size; i++){
-	        		if(((centers.get(i).getX() + 50)>newx && newx>(centers.get(i).getX() - 50)) && 
-	        				((centers.get(i).getY() + 50)>newy && newy>(centers.get(i).getY() - 50))){
-	        			selected = i;
-	        		}
-	        	}
-        	}catch(IndexOutOfBoundsException e){
+        	for(int i = 0; i < size; i++){
+        		if(((centers.get(i).getX() + 50)>newx && newx>(centers.get(i).getX() - 50)) && 
+        				((centers.get(i).getY() + 50)>newy && newy>(centers.get(i).getY() - 50))){
+        			return i;
+        		}
         	}
-        	return selected--;
+        	return -1;
         }
         
 

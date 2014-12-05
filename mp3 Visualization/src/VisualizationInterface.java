@@ -158,7 +158,7 @@ public class VisualizationInterface extends Application {
 	  }
 	  
 	  @Override
-	  public void start(Stage primaryStage) {
+	  public void start(final Stage primaryStage) {
 		  stage = primaryStage;
 		  primaryStage.setTitle("Visual Eyes"); // clever name sounds like "visualize"
 		  Scene scene = new Scene(root);

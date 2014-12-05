@@ -9,14 +9,17 @@ Ryan Golden,
 Cullen Vaughn,
 Greg Lang
 
-Things that need to get done:  
-  Style/fancy up interface - Greg  
-  Playlist-style library - Greg  
-  song control - Greg  
-  Add microphone support - Cullen  
-  New Visualization - Ryan  
-  New Visualization - Kevin  
-  Documentation - (everyone document your own code)  
-  update platform to condense bands logarithmically - Eden (done)  
-  .wav file support - Eden (done...nothing to do)
+ Things that need to get done:  
+   Style/fancy up interface - Greg  
+-  Playlist-style library - Greg (done)  
+-  Song control - Greg (done)<br>
+-  Microphone support - Cullen   
+-  Spectrum line - Ryan (done)<br>
+-  Spectrum circles - Ryan (done)<br>
+-  General UML Diagram - Ryan (done)<br>
+-  Pixel fountain - Kevin<br>
+-  Framework - Eden (done)<br>
+-  Color shifting - Eden (done)<br>
+-  Frequency compression - Eden (done)<br>
+-  .wav file support - Eden (done)<br>
   

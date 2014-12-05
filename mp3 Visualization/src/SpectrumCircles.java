@@ -36,7 +36,6 @@ public class SpectrumCircles extends Visualization  {
 		private final int RADIUS = 50;
 		private ArrayList<Point> centers;
 		Canvas display;
-		FrequencyCompressor compressor;
 
 		/**
 		 * The main Constructor for spectrum circles

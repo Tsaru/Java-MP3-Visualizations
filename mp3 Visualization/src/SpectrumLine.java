@@ -28,7 +28,6 @@ public class SpectrumLine extends Visualization {
 	private final double COLOR_UPDATE_FREQUENCY = .1;
 	private boolean smooth, allowneg;
 	Canvas display;
-	FrequencyCompressor compressor;
 
 	SpectrumLine() {
 		this(100, true, true);

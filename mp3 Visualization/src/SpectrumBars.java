@@ -16,7 +16,6 @@ public class SpectrumBars extends Visualization {
 	private boolean isbottomColorShifting;
 	private double timeSinceColorUpdate;
 	Canvas display;
-	FrequencyCompressor compressor;
 
 	SpectrumBars() {
 		this(100);

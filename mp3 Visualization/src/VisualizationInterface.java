@@ -62,6 +62,10 @@ public class VisualizationInterface extends Application {
 	  
 	  private final Map<String,String> songNameLocMap = new HashMap<String,String>(); // Song name -> Song path (eg. Song1 -> C:\Users\..\Song1.mp3)
 	  
+	  /*
+	   * Starts a new song by setting the mediaPlayer to a new MediaPlayer object,
+	   * and playing it. Also re-sets the spectrumListener because it's a new object.
+	   */
 	  private void StartNewSong(String song_pathname) {
 	      try {
 	    	  mediaPlayer.stop();
@@ -83,6 +87,11 @@ public class VisualizationInterface extends Application {
 	      }
 	  }
 	  
+	  /*
+	   * Changes the active visualization by updating the internal spectrumListener and
+	   * mediaPlayer objects, removing the old visualization from the GUI, and adding
+	   * the new one.
+	   */
 	  private void UpdateVisualization() {
 		  if(visualizationChooserComboBox.getValue() != null) {
 			  if(visualization != null)

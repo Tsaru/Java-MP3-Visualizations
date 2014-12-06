@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -35,6 +36,7 @@ public class VisualizationInterface extends Application {
 	
 	  private Stage stage;
 	  private final BorderPane interfacePane = new BorderPane();
+	  private final BorderPane visualizationPane = new BorderPane();
 	  private final Button directoryBrowseButton = new Button("Open Playlist");
 	  private final DirectoryChooser directoryBrowse = new DirectoryChooser();
 	  private final Button playButton = new Button("Play");
@@ -108,7 +110,8 @@ public class VisualizationInterface extends Application {
 			  spectrumListener.setVisualization(visualization);
 			  mediaPlayer.setAudioSpectrumInterval(AUDIO_SPECTRUM_INTERVAL);
 			  mediaPlayer.setAudioSpectrumThreshold((-1)*visualization.getMaxVolume());
-			  interfacePane.setCenter(visualization.getNode()); // The visualizer occupies the center portion of the screen
+			  visualizationPane.setCenter(visualization.getNode());
+			  interfacePane.setCenter(visualizationPane); // The visualizer occupies the center portion of the screen
 			  stage.sizeToScene();
 		  }
 	  }
@@ -122,8 +125,19 @@ public class VisualizationInterface extends Application {
 	   * Sets the listOfSongs to contain the path of each discovered audio file
 	   * @param dir The directory in which to search for audio files
 	   */
-	  private void loadAllAudioFiles(File dir) {
+	  private void loadAllAudioFiles(File dir, int depth) {
 		  // listOfSongs.clear(); // remove comment if we want loading audio files to destroy the current list of songs
+		  if(depth==2) {return;} // prevent too much recursion (searching through too many sub-directories)
+		  
+		  // prevents user from selecting a drive, C:\ D:\ etc., which will crash the program -> too many files
+		  for(File drive : File.listRoots()) {
+			  if (dir == drive) {
+					// There is no easy way to display a message dialog to the user
+					// without creating another stage
+					return;
+			  }
+		  }
+
 		  if(dir!=null) { // null can be passed in if the user cancels the directory-chooser dialog
 			  try {
 				  File[] allFiles = dir.listFiles();
@@ -134,7 +148,7 @@ public class VisualizationInterface extends Application {
 						  listOfSongs.add(songNameNoExt);
 					  }
 					  else if(f.isDirectory()) {
-						  loadAllAudioFiles(f); // recursive call to search sub-directories
+						  loadAllAudioFiles(f,++depth); // recursive call to search sub-directories
 					  }
 				  }
 				  
@@ -142,7 +156,7 @@ public class VisualizationInterface extends Application {
 			  catch(SecurityException se) { } // i.e. permissions not granted to read specified directory
 			  catch(Exception e) { } // error occurred in loading directory or adding file to map
 		  }
-		  else { /* Do nothing */ }
+		  else { /* Do nothing */ /* Maximum depth may have been reached */}
 	  }
 	  
 	  /**
@@ -176,10 +190,14 @@ public class VisualizationInterface extends Application {
 		  interfaceElements.setVgap(5);
 		  interfaceElements.setHgap(5);
 		  
-		  HBox topBarElements = new HBox();
-		  topBarElements.getChildren().addAll(visualizationChooserLabel,visualizationChooserComboBox,directoryBrowseButton);
+		  HBox topBarElements = new HBox(8); // the number in the constructor specifies margin between each element
+		  topBarElements.getChildren().addAll(visualizationChooserLabel,visualizationChooserComboBox/*,directoryBrowseButton*/);
 		  
 		  VBox controlElements = new VBox();
+		  
+		  VBox playListControls = new VBox();
+		  directoryBrowseButton.setMinWidth(250d);
+		  playListControls.getChildren().addAll(songListView,directoryBrowseButton);
 		  
 		  HBox songControls = new HBox();
 		  songControls.getChildren().addAll(playButton,pauseButton);
@@ -195,7 +213,7 @@ public class VisualizationInterface extends Application {
 			  @Override
 			  public void handle(ActionEvent e) {
 				  File dir = directoryBrowse.showDialog(primaryStage);
-				  loadAllAudioFiles(dir);
+				  loadAllAudioFiles(dir,0);
 			  }
 		  });
 		  
@@ -228,8 +246,8 @@ public class VisualizationInterface extends Application {
 				  });
 		  
 		  interfacePane.setTop(topBarElements);
-		  interfacePane.setRight(songListView);
-		  interfacePane.setBottom(controlElements);
+		  interfacePane.setRight(playListControls);
+		  visualizationPane.setBottom(controlElements);
 		  root.getChildren().add(interfacePane);
 		  primaryStage.setScene(scene);
 		  

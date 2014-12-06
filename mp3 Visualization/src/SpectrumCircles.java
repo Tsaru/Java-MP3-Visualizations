@@ -48,8 +48,8 @@ public class SpectrumCircles extends Visualization  {
         	display = new Canvas();
     		compressor = new FrequencyCompressor(maxVolume);
     		isbottomColorShifting = false;
-        	width = 500;
-        	height = 500;
+        	width = 425;
+        	height = 425;
         	centers = new ArrayList<Point>();
     		topColor = Color.GOLD;
     		bottomColor = Color.BLUE;

@@ -1,3 +1,5 @@
+
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +13,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -28,7 +29,13 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
-
+/**
+ * This class provides a GUI for our music visualization program. It plays
+ * the songs, manages a playlist of songs, and manages which visualization
+ * is active.s
+ * @author Eden Doonan
+ * @author Greg Lang
+ */
 public class VisualizationInterface extends Application {
 	
 	  final int maximumVolume = 100;
@@ -50,7 +57,8 @@ public class VisualizationInterface extends Application {
 			        "Spectrum Bars",
 			        "Spectrum Bars Wide",
 			        "Spectrum Line",
-			        "Spectrum Circles"
+			        "Spectrum Circles",
+			        "Pixel Fountain"
 			    );
 	  private final ComboBox<String> visualizationChooserComboBox = new ComboBox<String>(visualizationList);
 	  
@@ -106,6 +114,8 @@ public class VisualizationInterface extends Application {
 				  visualization = new SpectrumLine(maximumVolume, true, false); //want to be able to choose smoothness and neg
 			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Circles") {
 				  visualization = new SpectrumCircles(200); //want to configure 100-200
+			  }else if(visualizationChooserComboBox.getValue() == "Pixel Fountain") {
+				  visualization = new PixelFountain(maximumVolume, 300, 300); //want to configure 100-200
 			  }
 			  spectrumListener.setVisualization(visualization);
 			  mediaPlayer.setAudioSpectrumInterval(AUDIO_SPECTRUM_INTERVAL);

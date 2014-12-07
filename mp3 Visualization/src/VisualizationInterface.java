@@ -38,9 +38,13 @@ import javafx.stage.Stage;
  */
 public class VisualizationInterface extends Application {
 	
+	  // The maximum value of any element of the magnitudes array passed to
+	  // the SpectrumListener object by the MediaPlayer object.
 	  final int maximumVolume = 100;
+	  // The value we will set with MediaPlayer.setAudioSpectrumInterval().
 	  final double AUDIO_SPECTRUM_INTERVAL = 0.08;
 	
+	  // UI elements
 	  private Stage stage;
 	  private final BorderPane interfacePane = new BorderPane();
 	  private final BorderPane visualizationPane = new BorderPane();
@@ -51,6 +55,7 @@ public class VisualizationInterface extends Application {
 	  private final Slider slideDisplay = new Slider(0,1,0);
 	  private final Label durationLabel = new Label("");
 	  
+	  // UI elements for choosing the active visualization
 	  private final Label visualizationChooserLabel = new Label("Visualization Mode");
 	  private final ObservableList<String> visualizationList = 
 			    FXCollections.observableArrayList(
@@ -62,8 +67,13 @@ public class VisualizationInterface extends Application {
 			    );
 	  private final ComboBox<String> visualizationChooserComboBox = new ComboBox<String>(visualizationList);
 	  
+	  // The visualization object being displayed on the screen.
 	  private Visualization visualization;
+	  
+	  // The object to connect the Visualization to the MediaPlayer.
 	  private SpectrumListener spectrumListener;
+	  
+	  // The object to play the music
 	  private MediaPlayer mediaPlayer;
 	  private VBox root = new VBox(10);
 	  

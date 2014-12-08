@@ -48,7 +48,7 @@ public class PixelFountain extends Visualization
 	}
 	PixelFountain(int volMax)
 	{
-		this(volMax, 400, 400);		
+		this(volMax, 550, 550);		
 	}
 	/**
 	 * Constructor that initializes everything needed for the visualization 
@@ -185,7 +185,7 @@ public class PixelFountain extends Visualization
 		{
 			for(int j = 0, size = drops.get(i).size(); j < size;j++)
 			{
-				if (drops.get(i).get(j).getX() > 400 || drops.get(i).get(j).getY() > 400)
+				if (drops.get(i).get(j).getX() > 550 || drops.get(i).get(j).getY() > 550)
 				{
 					drops.get(i).remove(j);
 					size--;

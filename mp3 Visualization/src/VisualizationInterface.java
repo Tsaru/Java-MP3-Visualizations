@@ -125,7 +125,7 @@ public class VisualizationInterface extends Application {
 			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Circles") {
 				  visualization = new SpectrumCircles(200); //want to configure 100-200
 			  }else if(visualizationChooserComboBox.getValue() == "Pixel Fountain") {
-				  visualization = new PixelFountain(maximumVolume, 300, 300); //want to configure 100-200
+				  visualization = new PixelFountain(maximumVolume, 550, 550); //want to configure 100-200
 			  }
 			  spectrumListener.setVisualization(visualization);
 			  mediaPlayer.setAudioSpectrumInterval(AUDIO_SPECTRUM_INTERVAL);

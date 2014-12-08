@@ -13,30 +13,21 @@ import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.RadialGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
-import java.awt.Point;
-import java.awt.Dimension;
-import java.util.Random;
 
 public class PixelFountain extends Visualization
 {
 	private int  width, height, colorShiftIndex;
-	private ArrayList<ArrayList<Point>> drops;//holds the points and directions of points
-	private Color bottomColor, topColor, backgroundColor;
+	private ArrayList<ArrayList<ColoredPoint>> drops; //holds the points and directions of points
+	private Color backgroundColor;
 	private Color[] colorShiftVals;
 	private double [] angles;
-	private boolean isbottomColorShifting;
 	private double timeSinceColorUpdate;
-	private final int COLOR_SHIFT_SPEED = 3;
+	private final int COLOR_SHIFT_SPEED = 8;
 	private final double COLOR_UPDATE_FREQUENCY = .1;
-	private final static float THRESHOLD = (float).5; 
+	private final static float THRESHOLD = (float).7; 
 	private final static int SPEED = 5; 
-	private int increment = 0;
 	
 	Canvas display;
 	FrequencyCompressor compressor;
@@ -62,13 +53,9 @@ public class PixelFountain extends Visualization
 		System.out.println("New Pixel Fountain");
 		display = new Canvas();
 		angles = new double[90];
-		drops = new ArrayList<ArrayList<Point>>();
+		drops = new ArrayList<ArrayList<ColoredPoint>>();
 		compressor = new FrequencyCompressor(volMax);
-		//dropBuildUp = new float[90];
-		isbottomColorShifting = false;
-		bottomColor = Color.CYAN;
-		topColor = Color.RED;
-		colorShiftVals = Gradient.buildRandomGradient(topColor, 210, COLOR_SHIFT_SPEED);
+		colorShiftVals = Gradient.buildRandomGradient(Color.RED, 210, COLOR_SHIFT_SPEED);
 		maxVolume = volMax;
 		width = w;
 		height = h;
@@ -88,7 +75,7 @@ public class PixelFountain extends Visualization
 	{
 		for(int i = 0; i < 90; i++)
 		{
-			drops.add(new ArrayList<Point>());
+			drops.add(new ArrayList<ColoredPoint>());
 			angles[i] = 2 * Math.PI *i/90;
 		}
 	}
@@ -96,22 +83,11 @@ public class PixelFountain extends Visualization
 	 * Using the Gradient Class increments the colors seen in the graph
 	 */
 	private void incrementColors() {
-		if(isbottomColorShifting)
-			bottomColor = colorShiftVals[colorShiftIndex];
-		else
-			topColor = colorShiftVals[colorShiftIndex];
-		colorShiftIndex += 1;
-		if(colorShiftIndex == colorShiftVals.length) {
-			colorShiftIndex = 0;
-			if(isbottomColorShifting) {
-				isbottomColorShifting = false;
-				colorShiftVals = Gradient.buildRandomGradient(topColor, 210, COLOR_SHIFT_SPEED);
-			}
-			else {
-				isbottomColorShifting = true;
-				colorShiftVals = Gradient.buildRandomGradient(bottomColor, 210, COLOR_SHIFT_SPEED);
-			}
+		if(colorShiftIndex == colorShiftVals.length-1) {
+			colorShiftVals = Gradient.buildRandomGradient(colorShiftVals[colorShiftIndex], 210, COLOR_SHIFT_SPEED);
+			colorShiftIndex = -1;
 		}
+		colorShiftIndex += 1;
 	}
 	/**
 	 * Uses the compressor to logarithmically make the magnitudes even and gives esthetically pleasing number of drops back
@@ -162,7 +138,7 @@ public class PixelFountain extends Visualization
 			{
 				//if so, creates the center for which all drops radiate.
 				//should be one for every updated bucket value.
-				Point center = new Point(width/2,height/2);
+				ColoredPoint center = new ColoredPoint(width/2,height/2,colorShiftVals[colorShiftIndex]);
 				drops.get(i).add(center);
 				
 			}
@@ -170,7 +146,8 @@ public class PixelFountain extends Visualization
 			{
 				//creates the path that he drops follow
 				drops.get(i).get(j).setLocation(drops.get(i).get(j).getX()+Math.cos(angles[i])*SPEED, drops.get(i).get(j).getY()+Math.sin(angles[i])*SPEED);
-				context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REPEAT,new Stop(0.0, topColor),new Stop(1.0, bottomColor)));
+				//context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REPEAT,new Stop(0.0, topColor),new Stop(1.0, bottomColor)));
+				context.setFill(drops.get(i).get(j).getColor());
 				context.fillRect(drops.get(i).get(j).getX(),drops.get(i).get(j).getY(), 2, 2);
 			} 
 		}

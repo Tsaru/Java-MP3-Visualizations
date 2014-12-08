@@ -20,13 +20,13 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 import java.awt.Point;
+import java.awt.Dimension;
 import java.util.Random;
 
 public class PixelFountain extends Visualization
 {
 	private int  width, height, colorShiftIndex;
 	private ArrayList<ArrayList<Point>> drops;//holds the points and directions of points
-	private float[] dropBuildUp;
 	private Color bottomColor, topColor, backgroundColor;
 	private Color[] colorShiftVals;
 	private double [] angles;
@@ -34,7 +34,7 @@ public class PixelFountain extends Visualization
 	private double timeSinceColorUpdate;
 	private final int COLOR_SHIFT_SPEED = 3;
 	private final double COLOR_UPDATE_FREQUENCY = .1;
-	private final static float THRESHOLD = (float).1; 
+	private final static float THRESHOLD = (float).5; 
 	private final static int SPEED = 5; 
 	private int increment = 0;
 	
@@ -50,14 +50,21 @@ public class PixelFountain extends Visualization
 	{
 		this(volMax, 400, 400);		
 	}
-	
-	PixelFountain(int volMax, int w, int h) {//constructor Intitializes all value needed for the visual effects.
+	/**
+	 * Constructor that initializes everything needed for the visualization 
+	 * 
+	 * @param volMax - the max volume from the spectrum listener
+	 * @param w	- the width of the visualization canvas 
+	 * @param h - the height of the visualization canvas 
+	 */
+	PixelFountain(int volMax, int w, int h) {
+		
 		System.out.println("New Pixel Fountain");
 		display = new Canvas();
-		//dropBuildUp = new float[90];
 		angles = new double[90];
 		drops = new ArrayList<ArrayList<Point>>();
 		compressor = new FrequencyCompressor(volMax);
+		//dropBuildUp = new float[90];
 		isbottomColorShifting = false;
 		bottomColor = Color.CYAN;
 		topColor = Color.RED;
@@ -82,8 +89,7 @@ public class PixelFountain extends Visualization
 		for(int i = 0; i < 90; i++)
 		{
 			drops.add(new ArrayList<Point>());
-			//dropBuildUp[i] = 0;
-			//System.out.println(dropBuildUp[i]);
+			angles[i] = 2 * Math.PI *i/90;
 		}
 	}
 	/**
@@ -115,7 +121,7 @@ public class PixelFountain extends Visualization
 	 * @return				The heights used on the line graph
 	 */
 	private float[] ProcessDropCount(float[] magnitudes, double timestamp) {
-		float[] buckets = compressor.compressHeights(magnitudes, 90, timestamp);
+		float[] buckets = compressor.compressHeights(magnitudes, 128, timestamp);
 		return buckets;
 	}
 	
@@ -136,56 +142,42 @@ public class PixelFountain extends Visualization
 		display.setHeight(height);
 		context.setFill(backgroundColor);
 		context.fillRect(0, 0, display.getWidth(), display.getHeight());
-		
+		//Dimension dim = new Dimension(2,2);
 		//change color of the drops
 		timeSinceColorUpdate += duration;
 		if(timeSinceColorUpdate >= COLOR_UPDATE_FREQUENCY) {
 			timeSinceColorUpdate = 0;
 			incrementColors();
 		}
+		
 		//grabs the sound levels from the Compressor for the points.
 		float [] buckets = ProcessDropCount(magnitudes, timestamp);
+		
 		//sets up for animation
-		//increment++;
 		for (int i = 0; i < 90;i++)
 		{
-			angles[i] = 2 * Math.PI *i;
+			
+			//dropBuildUp[i] += buckets[i]; 
 			if(buckets[i] > THRESHOLD)//checks to see if the bucket's value is above the threshold  
 			{
 				//if so, creates the center for which all drops radiate.
 				//should be one for every updated bucket value.
 				Point center = new Point(width/2,height/2);
 				drops.get(i).add(center);
+				
 			}
 			for (int j = 0, size = drops.get(i).size(); j<size ; j++)
 			{
-				//make the trig fucntions cosntant and make an array to hold those.
-				
-				//the visual path
-				if(Math.cos((angles[i])) > 0 && Math.sin((angles[i])) > 0)
-				{
-					drops.get(i).get(j).setLocation(drops.get(i).get(j).getX()+Math.cos(angles[i])*SPEED, drops.get(i).get(j).getY()+Math.sin(angles[i])*SPEED);
-				}
-				else if(Math.cos((angles[i])) < 0 && Math.sin((angles[i])) < 0)
-				{
-					drops.get(i).get(j).setLocation(drops.get(i).get(j).getX()-Math.cos((angles[i]))*SPEED, drops.get(i).get(j).getY()-Math.sin((angles[i]))*SPEED);
-				}
-				else if(Math.sin((angles[i])) > 0 && Math.cos((angles[i])) < 0)
-				{
-					drops.get(i).get(j).setLocation(drops.get(i).get(j).getX()+Math.cos((angles[i]))*SPEED, drops.get(i).get(j).getY()-Math.sin((angles[i]))*SPEED);
-				}
-				else if(Math.sin((angles[i])) < 0 && Math.cos((angles[i])) > 0)
-				{
-					drops.get(i).get(j).setLocation(drops.get(i).get(j).getX()-Math.cos((angles[i]))*SPEED, drops.get(i).get(j).getY()+Math.sin((angles[i]))*SPEED);
-				}
+				//creates the path that he drops follow
+				drops.get(i).get(j).setLocation(drops.get(i).get(j).getX()+Math.cos(angles[i])*SPEED, drops.get(i).get(j).getY()+Math.sin(angles[i])*SPEED);
 				context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REPEAT,new Stop(0.0, topColor),new Stop(1.0, bottomColor)));
-				context.fillRect(drops.get(i).get(j).getX(),drops.get(i).get(j).getY(), 1, 1);
+				context.fillRect(drops.get(i).get(j).getX(),drops.get(i).get(j).getY(), 2, 2);
 			} 
 		}
 		CheckDrops();
 	}
 	/**
-	 * deletes the drops as they go off screen
+	 * deletes the drops as they go off canvas
 	 */
 	public void CheckDrops()
 	{

@@ -49,6 +49,7 @@ public class VisualizationInterface extends Application {
 	  private final BorderPane interfacePane = new BorderPane();
 	  private final BorderPane visualizationPane = new BorderPane();
 	  private final Button directoryBrowseButton = new Button("Open Playlist");
+	  private final Button RecordButton = new Button("Record");
 	  private final DirectoryChooser directoryBrowse = new DirectoryChooser();
 	  private final Button playButton = new Button("Play");
 	  private final Button pauseButton = new Button("Pause");
@@ -217,7 +218,7 @@ public class VisualizationInterface extends Application {
 		  
 		  VBox playListControls = new VBox();
 		  directoryBrowseButton.setMinWidth(250d);
-		  playListControls.getChildren().addAll(songListView,directoryBrowseButton);
+		  playListControls.getChildren().addAll(songListView,directoryBrowseButton,RecordButton);
 		  
 		  HBox songControls = new HBox();
 		  songControls.getChildren().addAll(playButton,pauseButton);
@@ -250,6 +251,13 @@ public class VisualizationInterface extends Application {
 			  }
 		  });
 		  
+		  RecordButton.setOnAction(new EventHandler<ActionEvent>() {
+			  @Override
+			  public void handle(ActionEvent e) {
+				  SpectrumMicrophone();
+			  }
+		  });
+		  
 		  visualizationChooserComboBox.valueProperty().addListener(new ChangeListener<String>() {
 	            public void changed(ObservableValue<? extends String> ov,
 	                String old_val, String new_val) {
@@ -279,4 +287,9 @@ public class VisualizationInterface extends Application {
 
 		  primaryStage.show();
 	  }
+
+	protected void SpectrumMicrophone() {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class PixelFountain extends Visualization
 {
 	private int  width, height, colorShiftIndex;
-	private ArrayList<ArrayList<ColoredPoint>> drops; //holds the points and directions of points
+	private ArrayList<ArrayList<ColoredPoint>> drops; //holds the points and directions 
 	private Color backgroundColor;
 	private Color[] colorShiftVals;
 	private double [] angles;
@@ -146,9 +146,8 @@ public class PixelFountain extends Visualization
 			{
 				//creates the path that he drops follow
 				drops.get(i).get(j).setLocation(drops.get(i).get(j).getX()+Math.cos(angles[i])*SPEED, drops.get(i).get(j).getY()+Math.sin(angles[i])*SPEED);
-				//context.setFill(new RadialGradient(0, 0, 0.5, 0.5, 0.1, true, CycleMethod.REPEAT,new Stop(0.0, topColor),new Stop(1.0, bottomColor)));
-				context.setFill(drops.get(i).get(j).getColor());
-				context.fillRect(drops.get(i).get(j).getX(),drops.get(i).get(j).getY(), 2, 2);
+				context.setFill(drops.get(i).get(j).getColor());//setst he color to fill the rectangle
+				context.fillRect(drops.get(i).get(j).getX(),drops.get(i).get(j).getY(), 2, 2);//actually fils the rectangle
 			} 
 		}
 		CheckDrops();

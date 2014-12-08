@@ -42,7 +42,7 @@ public class VisualizationInterface extends Application {
 	  // the SpectrumListener object by the MediaPlayer object.
 	  final int maximumVolume = 100;
 	  // The value we will set with MediaPlayer.setAudioSpectrumInterval().
-	  final double AUDIO_SPECTRUM_INTERVAL = 0.08;
+	  double AUDIO_SPECTRUM_INTERVAL = 0.1;
 	
 	  // UI elements
 	  private Stage stage;
@@ -117,14 +117,19 @@ public class VisualizationInterface extends Application {
 			  if(visualization != null)
 				  interfacePane.setCenter(null);
 			  if(visualizationChooserComboBox.getValue() == "Spectrum Bars") {
+				  AUDIO_SPECTRUM_INTERVAL = 0.06;
 				  visualization = new SpectrumBars(maximumVolume);
 			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Bars Wide") {
+				  AUDIO_SPECTRUM_INTERVAL = 0.06;
 				  visualization = new SpectrumBars(maximumVolume, 12);
 			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Line") {
+				  AUDIO_SPECTRUM_INTERVAL = 0.08;
 				  visualization = new SpectrumLine(maximumVolume, true, false); //want to be able to choose smoothness and neg
 			  }else if(visualizationChooserComboBox.getValue() == "Spectrum Circles") {
+				  AUDIO_SPECTRUM_INTERVAL = 0.06;
 				  visualization = new SpectrumCircles(200); //want to configure 100-200
 			  }else if(visualizationChooserComboBox.getValue() == "Pixel Fountain") {
+				  AUDIO_SPECTRUM_INTERVAL = 0.04;
 				  visualization = new PixelFountain(maximumVolume, 550, 550); //want to configure 100-200
 			  }
 			  spectrumListener.setVisualization(visualization);

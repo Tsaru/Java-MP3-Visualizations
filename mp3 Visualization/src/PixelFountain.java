@@ -26,7 +26,7 @@ public class PixelFountain extends Visualization
 	private double timeSinceColorUpdate;
 	private final int COLOR_SHIFT_SPEED = 8;
 	private final double COLOR_UPDATE_FREQUENCY = .1;
-	private final static float THRESHOLD = (float).7; 
+	private final static float THRESHOLD = (float).3; 
 	private final static int SPEED = 5; 
 	
 	Canvas display;

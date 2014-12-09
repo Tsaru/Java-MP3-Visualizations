@@ -14,7 +14,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -23,9 +26,11 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -114,7 +119,7 @@ public class VisualizationInterface extends Application {
 	   * the new one.
 	   */
 	  private void UpdateVisualization() {
-		  if(visualizationChooserComboBox.getValue() != null) {
+		  if(visualizationChooserComboBox.getValue() != null && mediaPlayer != null) {
 			  if(visualization != null)
 				  interfacePane.setCenter(null);
 			  if(visualizationChooserComboBox.getValue() == "Spectrum Bars") {
@@ -240,19 +245,33 @@ public class VisualizationInterface extends Application {
 			  public void handle(ActionEvent e) {
 				  File dir = directoryBrowse.showDialog(primaryStage);
 				  loadAllAudioFiles(dir,0);
+				  if (mediaPlayer == null){
+					  mediaPlayer = new MediaPlayer(new Media("file:/"+encodeURL(songNameLocMap.values().iterator().next())));
+			    	  spectrumListener = new SpectrumListener();
+			    	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
+			    	  mediaPlayer.play();
+				  }
+				  UpdateVisualization();
 			  }
 		  });
 		  
 		  playButton.setOnAction(new EventHandler<ActionEvent>() {
 			  @Override
 			  public void handle(ActionEvent e) {
-				  mediaPlayer.play();
+				  try{
+					  mediaPlayer.play();
+				  }catch(Exception e1){
+					  
+				  }
 			  }
 		  });
 		  pauseButton.setOnAction(new EventHandler<ActionEvent>() {
 			  @Override
 			  public void handle(ActionEvent e) {
-				  mediaPlayer.pause();
+				  try{
+					  mediaPlayer.pause();
+				  }catch(Exception e1){
+				  }
 			  }
 		  });
 		  
@@ -281,15 +300,13 @@ public class VisualizationInterface extends Application {
 		  interfacePane.setTop(topBarElements);
 		  interfacePane.setRight(playListControls);
 		  visualizationPane.setBottom(controlElements);
+		  Region spacer = new Region();
+		  spacer.setMinSize(300, 300);
+		  visualizationPane.setCenter(spacer);
+		  interfacePane.setCenter(visualizationPane);
 		  root.getChildren().add(interfacePane);
 		  primaryStage.setScene(scene);
-		  
-    	  mediaPlayer = new MediaPlayer(new Media("file:/"+getClass().getResource("Train - Drops of Jupiter.mp3").toString().substring(6)));
-    	  spectrumListener = new SpectrumListener();
-    	  mediaPlayer.setAudioSpectrumListener(spectrumListener);
 		  visualizationChooserComboBox.getSelectionModel().selectFirst();
-    	  mediaPlayer.play();
-
 		  primaryStage.show();
 	  }
 
